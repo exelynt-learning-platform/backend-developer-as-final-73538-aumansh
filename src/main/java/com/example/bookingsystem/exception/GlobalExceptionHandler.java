@@ -23,14 +23,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse("Bad Request", "Malformed JSON request"), HttpStatus.BAD_REQUEST);
     }
 
-
-    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> authenticationHandling(org.springframework.security.core.AuthenticationException exception) {
-        return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid credentials"), HttpStatus.UNAUTHORIZED);
-    }
-
-
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+@ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> accessDeniedHandling(org.springframework.security.access.AccessDeniedException exception) {
         return new ResponseEntity<>(new ErrorResponse("Forbidden", "Access denied"), HttpStatus.FORBIDDEN);
     }
@@ -62,6 +55,12 @@ public class GlobalExceptionHandler {
     }
 
 
+
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> badCredentialsHandling(org.springframework.security.authentication.BadCredentialsException exception) {
+        logger.error("Authentication failed: {}", exception.getMessage());
+        return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid credentials"), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(Exception.class)
     public org.springframework.http.ResponseEntity<com.example.bookingsystem.dto.ErrorResponse> handleGlobalException(Exception ex) {
