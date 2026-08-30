@@ -11,6 +11,12 @@ import org.springframework.stereotype.Component;
 @lombok.extern.slf4j.Slf4j
 public class DataSeeder implements CommandLineRunner {
 
+    @org.springframework.beans.factory.annotation.Value("${SEED_ADMIN_PASSWORD}")
+    private String adminPass;
+
+    @org.springframework.beans.factory.annotation.Value("${SEED_USER_PASSWORD}")
+    private String userPass;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -23,23 +29,11 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String adminPass = System.getenv("SEED_ADMIN_PASSWORD");
-        if (adminPass == null || adminPass.isEmpty()) {
-            adminPass = "admin123";
-            System.out.println("=================================================");
-            System.out.println("WARNING: SEED_ADMIN_PASSWORD not set!");
-            System.out.println("Using fixed default ADMIN password: " + adminPass);
-            System.out.println("DO NOT USE THIS IN PRODUCTION!");
-            System.out.println("=================================================");
+                if (adminPass == null || adminPass.isEmpty()) {
+            throw new RuntimeException("SEED_ADMIN_PASSWORD environment variable is missing.");
         }
-        String userPass = System.getenv("SEED_USER_PASSWORD");
-        if (userPass == null || userPass.isEmpty()) {
-            userPass = "user123";
-            System.out.println("=================================================");
-            System.out.println("WARNING: SEED_USER_PASSWORD not set!");
-            System.out.println("Using fixed default USER password: " + userPass);
-            System.out.println("DO NOT USE THIS IN PRODUCTION!");
-            System.out.println("=================================================");
+                if (userPass == null || userPass.isEmpty()) {
+            throw new RuntimeException("SEED_USER_PASSWORD environment variable is missing.");
         }
         if (userRepository.count() == 0) {
             User admin = new User();
