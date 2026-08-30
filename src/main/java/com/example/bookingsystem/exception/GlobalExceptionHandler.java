@@ -16,6 +16,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> messageNotReadableHandling(org.springframework.http.converter.HttpMessageNotReadableException exception) {
         return new ResponseEntity<>(new ErrorResponse("Bad Request", "Malformed JSON request"), HttpStatus.BAD_REQUEST);
@@ -28,8 +30,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid credentials"), HttpStatus.UNAUTHORIZED);
     }
 
-
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> accessDeniedHandling(org.springframework.security.access.AccessDeniedException exception) {

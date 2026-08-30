@@ -15,5 +15,7 @@ public class ResourceDto {
     private String name;
 
     private String description;
+        @jakarta.validation.constraints.NotNull(message = "Price cannot be null")
+    @jakarta.validation.constraints.Positive(message = "Price must be positive")
     private BigDecimal price;
 }
