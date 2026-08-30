@@ -26,12 +26,12 @@ public class DataSeeder implements CommandLineRunner {
         String adminPass = System.getenv("SEED_ADMIN_PASSWORD");
         if (adminPass == null || adminPass.isEmpty()) {
             adminPass = java.util.UUID.randomUUID().toString();
-            log.warn("SEED_ADMIN_PASSWORD not set. Using generated password: " + adminPass);
+            
         }
         String userPass = System.getenv("SEED_USER_PASSWORD");
         if (userPass == null || userPass.isEmpty()) {
             userPass = java.util.UUID.randomUUID().toString();
-            log.warn("SEED_USER_PASSWORD not set. Using generated password: " + userPass);
+            
         }
         if (userRepository.count() == 0) {
             User admin = new User();

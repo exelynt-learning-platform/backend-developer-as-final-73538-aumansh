@@ -24,17 +24,22 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtTokenProvider.generateToken(authentication);
+            String token = jwtTokenProvider.generateToken(authentication);
 
-        JwtAuthResponse authResponse = new JwtAuthResponse();
-        authResponse.setAccessToken(token);
+            JwtAuthResponse authResponse = new JwtAuthResponse();
+            authResponse.setAccessToken(token);
 
-        return ResponseEntity.ok(authResponse);
+            return ResponseEntity.ok(authResponse);
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                    .body(new com.example.bookingsystem.dto.ErrorResponse("Unauthorized", "Invalid username or password"));
+        }
     }
 }

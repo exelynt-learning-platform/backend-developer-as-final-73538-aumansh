@@ -112,12 +112,18 @@ public class ReservationService {
 
     
     private void validateReservationRequest(ReservationRequest request) {
+        validateTimeline(request);
+        validateOverlap(request);
+    }
+    private void validateTimeline(ReservationRequest request) {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new ValidationException("Start and end time must not be null");
         }
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new ValidationException("Start time must be before end time");
         }
+    }
+    private void validateOverlap(ReservationRequest request) {
         if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), ReservationStatus.CANCELLED) > 0) {
             throw new ValidationException("Reservation overlaps with an existing booking");
         }
