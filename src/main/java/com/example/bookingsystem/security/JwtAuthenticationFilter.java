@@ -15,8 +15,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.bookingsystem.exception.UnauthorizedException;
 
 import java.io.IOException;
+import org.springframework.core.annotation.Order;
 
 @Component
+@Order(1)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";

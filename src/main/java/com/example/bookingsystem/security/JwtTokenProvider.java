@@ -31,7 +31,7 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
+        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${jwt.secret}")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
         try {
