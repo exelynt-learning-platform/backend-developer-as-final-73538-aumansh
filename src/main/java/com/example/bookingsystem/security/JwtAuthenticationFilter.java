@@ -42,10 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
         if (!StringUtils.hasText(token)) {
-            if (SecurityContextHolder.getContext().getAuthentication() == null && uri != null && !uri.startsWith("/auth/") && !uri.startsWith("/swagger") && !uri.startsWith("/v3/")) {
-                authenticationEntryPoint.commence(request, response, new org.springframework.security.authentication.AuthenticationCredentialsNotFoundException("JWT token is missing"));
-                return;
-            }
             filterChain.doFilter(request, response);
             return;
         }

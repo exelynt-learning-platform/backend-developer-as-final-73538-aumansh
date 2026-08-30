@@ -157,6 +157,9 @@
 						<JWT_SECRET>VGhpcyBpcyBhIHRlc3Qgc2VjcmV0IGtleSB0aGF0IG11c3QgYmUgYXQgbGVhc3QgMjU2IGJpdHMgbG9uZw==</JWT_SECRET>
 						<SEED_ADMIN_PASSWORD>admin123</SEED_ADMIN_PASSWORD>
 						<SEED_USER_PASSWORD>user123</SEED_USER_PASSWORD>
+						<DB_USERNAME>root</DB_USERNAME>
+						<DB_PASSWORD>root</DB_PASSWORD>
+						<DB_URL>jdbc:mysql://localhost:3306/booking_db?createDatabaseIfNotExist=true</DB_URL>
 					</environmentVariables>
 				</configuration>
 			</plugin>

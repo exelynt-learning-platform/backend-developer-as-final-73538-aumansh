@@ -62,7 +62,7 @@ public class ReservationService {
 
         Specification<Reservation> spec = ReservationSpecification.filterReservations(status, minPrice, maxPrice);
         if (user.getRole() != Role.ROLE_ADMIN) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("user").get("id"), user.getId()));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("user").get("id"), user.getId()));
         }
 
         return reservationRepository.findAll(spec, pageable).map(DtoMapper::mapToReservationDto);

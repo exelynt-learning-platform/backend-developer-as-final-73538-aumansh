@@ -2,6 +2,7 @@ package com.example.bookingsystem.dto;
 
 import java.time.LocalDateTime;
 
+@lombok.Data
 public class ErrorResponse {
     private String error;
     private String message;
