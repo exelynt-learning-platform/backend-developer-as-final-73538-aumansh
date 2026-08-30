@@ -1,4 +1,4 @@
-﻿package com.example.bookingsystem.security;
+package com.example.bookingsystem.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import jakarta.annotation.PostConstruct;
+
 
 @Component
 public class JwtTokenProvider {
@@ -19,6 +21,14 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long jwtExpirationDate;
 
+    private Key cachedKey;
+
+    @PostConstruct
+    public void init() {
+        this.cachedKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    }
+
+
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         Date currentDate = new Date();
@@ -28,17 +38,15 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(key())
+                .signWith(cachedKey)
                 .compact();
     }
 
-    private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
+    
 
     public String getUsername(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key())
+                .setSigningKey(cachedKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -48,7 +56,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key())
+                    .setSigningKey(cachedKey)
                     .build()
                     .parse(token);
             return true;

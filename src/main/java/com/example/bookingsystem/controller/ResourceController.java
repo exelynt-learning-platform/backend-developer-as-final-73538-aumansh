@@ -31,9 +31,7 @@ public class ResourceController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PaginationUtil.createPageable(page, size, sortBy, sortDir);
         return ResponseEntity.ok(resourceService.getAllResources(pageable));
     }
 

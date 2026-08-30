@@ -21,6 +21,14 @@ import java.math.BigDecimal;
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
+    private String getUsername(Authentication authentication) {
+        if (authentication == null || getUsername(authentication) == null) {
+            throw new org.springframework.security.access.AccessDeniedException("User is not authenticated");
+        }
+        return getUsername(authentication);
+    }
+
+
     private final ReservationService reservationService;
 
     public ReservationController(ReservationService reservationService) {
@@ -31,7 +39,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @Valid @RequestBody ReservationRequest request,
             Authentication authentication) {
-        return new ResponseEntity<>(reservationService.createReservation(request, authentication.getName()), HttpStatus.CREATED);
+        return new ResponseEntity<>(reservationService.createReservation(request, getUsername(authentication)), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -45,16 +53,14 @@ public class ReservationController {
             @RequestParam(defaultValue = "asc") String sortDir,
             Authentication authentication) {
         
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PaginationUtil.createPageable(page, size, sortBy, sortDir);
 
-        return ResponseEntity.ok(reservationService.getReservations(authentication.getName(), status, minPrice, maxPrice, pageable));
+        return ResponseEntity.ok(reservationService.getReservations(getUsername(authentication), status, minPrice, maxPrice, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getReservationById(@PathVariable Long id, Authentication authentication) {
-        return ResponseEntity.ok(reservationService.getReservationById(id, authentication.getName()));
+        return ResponseEntity.ok(reservationService.getReservationById(id, getUsername(authentication)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -67,7 +73,7 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
-        reservationService.deleteReservation(id, authentication.getName());
+        reservationService.deleteReservation(id, getUsername(authentication));
         return ResponseEntity.ok("Reservation deleted successfully");
     }
 }
