@@ -46,15 +46,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
 
-        if (request.getStartTime() == null || request.getEndTime() == null) {
-            throw new ValidationException("Start and end time must not be null");
-        }
-        if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new ValidationException("Start time must be before end time");
-        }
-        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime()) > 0) {
-            throw new ValidationException("Reservation overlaps with an existing booking");
-        }
+        validateReservationRequest(request);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -113,6 +105,18 @@ public class ReservationService {
     }
 
     
+    private void validateReservationRequest(ReservationRequest request) {
+        if (request.getStartTime() == null || request.getEndTime() == null) {
+            throw new ValidationException("Start and end time must not be null");
+        }
+        if (request.getStartTime().isAfter(request.getEndTime())) {
+            throw new ValidationException("Start time must be before end time");
+        }
+        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime()) > 0) {
+            throw new ValidationException("Reservation overlaps with an existing booking");
+        }
+    }
+    
     private boolean isAdminOrOwner(User user, Reservation reservation) {
         if (user == null || reservation == null) return false;
         if (user.getRole() == Role.ROLE_ADMIN) {
@@ -124,18 +128,18 @@ public class ReservationService {
     private ReservationResponse mapToDto(Reservation reservation) {
         ReservationResponse dto = new ReservationResponse();
         dto.setId(reservation.getId());
-        dto.setUserId(java.util.Optional.ofNullable(reservation.getUser()).map(User::getId).orElse(null));
+        dto.setUserId(reservation.getUser() != null ? reservation.getUser().getId() : null);
         dto.setStartTime(reservation.getStartTime());
         dto.setEndTime(reservation.getEndTime());
         dto.setPrice(reservation.getPrice());
         dto.setStatus(reservation.getStatus());
 
         ResourceDto resourceDto = new ResourceDto();
-        java.util.Optional.ofNullable(reservation.getResource()).ifPresent(r -> {
-            resourceDto.setId(r.getId());
-            resourceDto.setName(r.getName());
-            resourceDto.setDescription(r.getDescription());
-        });
+        if (reservation.getResource() != null) {
+            resourceDto.setId(reservation.getResource().getId());
+            resourceDto.setName(reservation.getResource().getName());
+            resourceDto.setDescription(reservation.getResource().getDescription());
+        }
         dto.setResource(resourceDto);
 
         return dto;

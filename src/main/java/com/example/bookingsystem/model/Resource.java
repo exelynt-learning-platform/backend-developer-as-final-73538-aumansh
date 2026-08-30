@@ -21,4 +21,5 @@ public class Resource {
 
     @Column
     private String description;
+    private java.math.BigDecimal price;
 }

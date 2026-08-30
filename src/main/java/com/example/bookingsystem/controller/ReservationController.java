@@ -29,9 +29,6 @@ import java.math.BigDecimal;
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
-
-
-
     private final ReservationService reservationService;
 
     public ReservationController(ReservationService reservationService) {
@@ -70,8 +67,8 @@ public class ReservationController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
-            @RequestParam ReservationStatus status) {
-        return ResponseEntity.ok(reservationService.updateReservationStatus(id, status));
+            @RequestBody java.util.Map<String, ReservationStatus> updates) {
+        return ResponseEntity.ok(reservationService.updateReservationStatus(id, updates.get("status")));
     }
 
     @DeleteMapping("/{id}")

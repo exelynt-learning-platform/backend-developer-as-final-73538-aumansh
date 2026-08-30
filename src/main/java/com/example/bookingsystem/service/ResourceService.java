@@ -22,6 +22,7 @@ public class ResourceService {
         Resource resource = new Resource();
         resource.setName(resourceDto.getName());
         resource.setDescription(resourceDto.getDescription());
+        resource.setPrice(resourceDto.getPrice());
         Resource saved = resourceRepository.save(resource);
         return mapToDto(saved);
     }
@@ -43,6 +44,7 @@ public class ResourceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         resource.setName(resourceDto.getName());
         resource.setDescription(resourceDto.getDescription());
+        resource.setPrice(resourceDto.getPrice());
         Resource updated = resourceRepository.save(resource);
         return mapToDto(updated);
     }
@@ -58,6 +60,7 @@ public class ResourceService {
         dto.setId(resource.getId());
         dto.setName(resource.getName());
         dto.setDescription(resource.getDescription());
+        dto.setPrice(resource.getPrice());
         return dto;
     }
 }
