@@ -35,6 +35,9 @@ public class JwtTokenProvider {
         if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
+        if (jwtExpirationDate <= 0) {
+            throw new IllegalArgumentException("JWT expiration date must be positive.");
+        }
         try {
             byte[] decoded = Decoders.BASE64.decode(jwtSecret);
             if (decoded.length < MIN_SECRET_LENGTH) {
@@ -77,13 +80,15 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
+        if (cachedKey == null) {
+            throw new IllegalStateException("JWT Key is not initialized properly");
+        }
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(cachedKey)
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(cachedKey).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return false;
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
             return false;
         }
     }

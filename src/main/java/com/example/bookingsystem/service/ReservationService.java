@@ -104,6 +104,7 @@ public class ReservationService {
         reservationRepository.delete(reservation);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ReservationResponse getReservationById(Long id, String username) {
         User user = fetchUserForUsername(username);
         Reservation reservation = reservationRepository.findById(id)
@@ -124,7 +125,7 @@ public class ReservationService {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new ValidationException("Start and end time must not be null");
         }
-        if (request.getStartTime().isAfter(request.getEndTime())) {
+        if (!request.getStartTime().isBefore(request.getEndTime())) {
             throw new ValidationException("Start time must be before end time");
         }
     }
