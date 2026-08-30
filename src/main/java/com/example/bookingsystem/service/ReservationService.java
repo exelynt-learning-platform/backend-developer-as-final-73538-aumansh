@@ -46,11 +46,11 @@ public class ReservationService {
     }
 
     public ReservationResponse createReservation(ReservationRequest request, String username) {
-        validateTimeline(request);
         User user = getCurrentUser(username);
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
+        validateTimeline(request);
         validateOverlap(request);
 
         Reservation reservation = new Reservation();
