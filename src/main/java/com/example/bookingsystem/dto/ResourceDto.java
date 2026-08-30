@@ -6,6 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+import java.math.BigDecimal;
+
 public class ResourceDto {
     private Long id;
 
@@ -13,4 +15,5 @@ public class ResourceDto {
     private String name;
 
     private String description;
+    private BigDecimal price;
 }

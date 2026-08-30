@@ -8,7 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/api/resources")
@@ -20,10 +23,13 @@ public class ResourceController {
         this.resourceService = resourceService;
     }
 
+    
     @GetMapping
-    public ResponseEntity<List<ResourceDto>> getAllResources() {
-        return ResponseEntity.ok(resourceService.getAllResources());
+    public ResponseEntity<Page<ResourceDto>> getAllResources(
+            @org.springframework.data.web.PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(resourceService.getAllResources(pageable));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ResourceDto> getResourceById(@PathVariable Long id) {

@@ -6,8 +6,8 @@ import com.example.bookingsystem.model.Resource;
 import com.example.bookingsystem.repository.ResourceRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ResourceService {
@@ -22,15 +22,16 @@ public class ResourceService {
         Resource resource = new Resource();
         resource.setName(resourceDto.getName());
         resource.setDescription(resourceDto.getDescription());
+        resource.setPrice(resourceDto.getPrice());
         Resource saved = resourceRepository.save(resource);
         return mapToDto(saved);
     }
 
-    public List<ResourceDto> getAllResources() {
-        return resourceRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    
+    public Page<ResourceDto> getAllResources(Pageable pageable) {
+        return resourceRepository.findAll(pageable).map(this::mapToDto);
     }
+
 
     public ResourceDto getResourceById(Long id) {
         Resource resource = resourceRepository.findById(id)
@@ -43,6 +44,7 @@ public class ResourceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         resource.setName(resourceDto.getName());
         resource.setDescription(resourceDto.getDescription());
+        resource.setPrice(resourceDto.getPrice());
         Resource updated = resourceRepository.save(resource);
         return mapToDto(updated);
     }
@@ -58,6 +60,7 @@ public class ResourceService {
         dto.setId(resource.getId());
         dto.setName(resource.getName());
         dto.setDescription(resource.getDescription());
+        dto.setPrice(resource.getPrice());
         return dto;
     }
 }

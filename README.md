@@ -26,7 +26,8 @@ A RESTful Resource Booking System built with Spring Boot, Java 17+, Spring Secur
    `
 
 2. **Database Configuration:**
-   By default, the application is configured to connect to a MySQL database named ooking_db at localhost:3306 using the username oot and password password. The database will be created automatically if it doesn't exist.
+   By default, the application is configured to connect to a MySQL database named ooking_db at localhost:3306 using the username 
+oot and password password. The database will be created automatically if it doesn't exist.
 
    You can override these settings using environment variables:
 
@@ -41,6 +42,7 @@ A RESTful Resource Booking System built with Spring Boot, Java 17+, Spring Secur
    `
 
 ## Seed Users
+**WARNING: Strongly recommend changing these defaults immediately after the first login.**
 Upon startup, the application creates two seed users for testing:
 - **Admin User**: dmin / dmin123
 - **Standard User**: user / user123

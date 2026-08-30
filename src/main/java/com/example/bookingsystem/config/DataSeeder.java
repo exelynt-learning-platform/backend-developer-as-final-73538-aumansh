@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@lombok.extern.slf4j.Slf4j
 public class DataSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -18,18 +19,23 @@ public class DataSeeder implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    
+
     @Override
     public void run(String... args) throws Exception {
+        if ("admin123".equals(System.getenv().getOrDefault("SEED_ADMIN_PASSWORD", "admin123"))) {
+            log.warn("WARNING: Using default placeholder seed password for admin. Please change in production.");
+        }
         if (userRepository.count() == 0) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setPassword(passwordEncoder.encode(System.getenv().getOrDefault("SEED_ADMIN_PASSWORD", "admin123")));
             admin.setRole(Role.ROLE_ADMIN);
             userRepository.save(admin);
 
             User user = new User();
             user.setUsername("user");
-            user.setPassword(passwordEncoder.encode("user123"));
+            user.setPassword(passwordEncoder.encode(System.getenv().getOrDefault("SEED_USER_PASSWORD", "user123")));
             user.setRole(Role.ROLE_USER);
             userRepository.save(user);
         }

@@ -10,6 +10,7 @@ import com.example.bookingsystem.model.ReservationStatus;
 import com.example.bookingsystem.model.Resource;
 import com.example.bookingsystem.model.Role;
 import com.example.bookingsystem.model.User;
+import com.example.bookingsystem.exception.ValidationException;
 import com.example.bookingsystem.repository.ReservationRepository;
 import com.example.bookingsystem.repository.ResourceRepository;
 import com.example.bookingsystem.repository.UserRepository;
@@ -17,11 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import jakarta.persistence.criteria.Predicate;
+
 
 @Service
 public class ReservationService {
@@ -38,15 +38,15 @@ public class ReservationService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public ReservationResponse createReservation(ReservationRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
-        if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new IllegalArgumentException("Start time must be before end time");
-        }
+
+        validateReservationRequest(request, null);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -62,34 +62,19 @@ public class ReservationService {
 
     public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
-        Specification<Reservation> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            if (user.getRole() == Role.ROLE_USER) {
-                predicates.add(cb.equal(root.get("user").get("id"), user.getId()));
-            }
-
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
-            }
-
-            if (minPrice != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
-            }
-
-            if (maxPrice != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Reservation> spec = ReservationSpecification.filterReservations(user, status, minPrice, maxPrice);
 
         return reservationRepository.findAll(spec, pageable).map(this::mapToDto);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ReservationResponse updateReservationStatus(Long id, ReservationStatus status) {
+        if (status == null) {
+            throw new ValidationException("Reservation status cannot be null");
+        }
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
         reservation.setStatus(status);
@@ -97,13 +82,14 @@ public class ReservationService {
         return mapToDto(updated);
     }
 
+    @Transactional
     public void deleteReservation(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && !reservation.getUser().getId().equals(user.getId())) {
+        if (!isAdminOrOwner(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to delete this reservation");
         }
         reservationRepository.delete(reservation);
@@ -111,31 +97,48 @@ public class ReservationService {
     
     public ReservationResponse getReservationById(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && !reservation.getUser().getId().equals(user.getId())) {
+        if (!isAdminOrOwner(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to view this reservation");
         }
         return mapToDto(reservation);
     }
 
+    
+    private void validateReservationRequest(ReservationRequest request, Long excludedId) {
+        if (request.getStartTime() == null || request.getEndTime() == null) {
+            throw new ValidationException("Start and end time must not be null");
+        }
+        if (request.getStartTime().isAfter(request.getEndTime())) {
+            throw new ValidationException("Start time must be before end time");
+        }
+        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), excludedId) > 0) {
+            throw new ValidationException("Reservation overlaps with an existing booking");
+        }
+    }
+    
+    private boolean isAdminOrOwner(User user, Reservation reservation) {
+        if (user == null || reservation == null) return false;
+        if (user.getRole() == Role.ROLE_ADMIN) return true;
+        if (reservation.getUser() == null || reservation.getUser().getId() == null) return false;
+        return user.getId().equals(reservation.getUser().getId());
+    }
+
     private ReservationResponse mapToDto(Reservation reservation) {
         ReservationResponse dto = new ReservationResponse();
-        dto.setId(reservation.getId());
-        dto.setUserId(reservation.getUser().getId());
-        dto.setStartTime(reservation.getStartTime());
-        dto.setEndTime(reservation.getEndTime());
-        dto.setPrice(reservation.getPrice());
-        dto.setStatus(reservation.getStatus());
-
-        ResourceDto resourceDto = new ResourceDto();
-        resourceDto.setId(reservation.getResource().getId());
-        resourceDto.setName(reservation.getResource().getName());
-        resourceDto.setDescription(reservation.getResource().getDescription());
-        dto.setResource(resourceDto);
-
+        org.springframework.beans.BeanUtils.copyProperties(reservation, dto);
+        if (reservation.getUser() != null) {
+            dto.setUserId(reservation.getUser().getId());
+        }
+        if (reservation.getResource() != null) {
+            ResourceDto resourceDto = new ResourceDto();
+            org.springframework.beans.BeanUtils.copyProperties(reservation.getResource(), resourceDto);
+            dto.setResource(resourceDto);
+        }
         return dto;
     }
+
 }
