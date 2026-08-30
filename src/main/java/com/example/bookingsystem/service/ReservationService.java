@@ -10,6 +10,7 @@ import com.example.bookingsystem.model.ReservationStatus;
 import com.example.bookingsystem.model.Resource;
 import com.example.bookingsystem.model.Role;
 import com.example.bookingsystem.model.User;
+import com.example.bookingsystem.exception.ValidationException;
 import com.example.bookingsystem.repository.ReservationRepository;
 import com.example.bookingsystem.repository.ResourceRepository;
 import com.example.bookingsystem.repository.UserRepository;
@@ -120,18 +121,18 @@ public class ReservationService {
     private ReservationResponse mapToDto(Reservation reservation) {
         ReservationResponse dto = new ReservationResponse();
         dto.setId(reservation.getId());
-        dto.setUserId(reservation.getUser() != null ? reservation.getUser().getId() : null);
+        dto.setUserId(java.util.Optional.ofNullable(reservation.getUser()).map(User::getId).orElse(null));
         dto.setStartTime(reservation.getStartTime());
         dto.setEndTime(reservation.getEndTime());
         dto.setPrice(reservation.getPrice());
         dto.setStatus(reservation.getStatus());
 
         ResourceDto resourceDto = new ResourceDto();
-        if (reservation.getResource() != null) {
-            resourceDto.setId(reservation.getResource().getId());
-            resourceDto.setName(reservation.getResource().getName());
-            resourceDto.setDescription(reservation.getResource().getDescription());
-        }
+        java.util.Optional.ofNullable(reservation.getResource()).ifPresent(r -> {
+            resourceDto.setId(r.getId());
+            resourceDto.setName(r.getName());
+            resourceDto.setDescription(r.getDescription());
+        });
         dto.setResource(resourceDto);
 
         return dto;
