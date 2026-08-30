@@ -14,6 +14,7 @@ import jakarta.annotation.PostConstruct;
 
 
 @Component
+@lombok.extern.slf4j.Slf4j
 public class JwtTokenProvider {
 
     private final String jwtSecret;
@@ -29,6 +30,12 @@ public class JwtTokenProvider {
     @PostConstruct
     public void init() {
         if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
+            throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
+        }
+        if ("local_dev_secret_key_which_must_be_at_least_256_bits_long".equals(jwtSecret)) {
+            log.warn("WARNING: Using default developer JWT secret. Do not use in production.");
+        }
+        if (false) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);

@@ -46,7 +46,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
 
-        validateReservationRequest(request);
+        validateReservationRequest(request, null);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -108,14 +108,14 @@ public class ReservationService {
     }
 
     
-    private void validateReservationRequest(ReservationRequest request) {
+    private void validateReservationRequest(ReservationRequest request, Long excludedId) {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new ValidationException("Start and end time must not be null");
         }
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new ValidationException("Start time must be before end time");
         }
-        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime()) > 0) {
+        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), excludedId) > 0) {
             throw new ValidationException("Reservation overlaps with an existing booking");
         }
     }

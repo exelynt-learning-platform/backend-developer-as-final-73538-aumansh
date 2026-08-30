@@ -65,7 +65,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.updateReservationStatus(id, request.getStatus()));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
         reservationService.deleteReservation(id, AuthUtil.getUsername(authentication));
