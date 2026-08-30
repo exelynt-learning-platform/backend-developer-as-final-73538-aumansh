@@ -26,11 +26,7 @@ public class ResourceController {
     
     @GetMapping
     public ResponseEntity<Page<ResourceDto>> getAllResources(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir) {
-        Pageable pageable = PaginationUtil.createPageable(page, size, sortBy, sortDir);
+            @org.springframework.data.web.PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(resourceService.getAllResources(pageable));
     }
 

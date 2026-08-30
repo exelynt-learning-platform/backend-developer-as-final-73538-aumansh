@@ -46,13 +46,8 @@ public class ReservationController {
             @RequestParam(required = false) ReservationStatus status,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
+            @org.springframework.data.web.PageableDefault(size = 10, sort = "id") Pageable pageable,
             Authentication authentication) {
-        
-        Pageable pageable = PaginationUtil.createPageable(page, size, sortBy, sortDir);
 
         return ResponseEntity.ok(reservationService.getReservations(AuthUtil.getUsername(authentication), status, minPrice, maxPrice, pageable));
     }
