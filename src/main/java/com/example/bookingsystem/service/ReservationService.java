@@ -46,12 +46,12 @@ public class ReservationService {
     }
 
     public ReservationResponse createReservation(ReservationRequest request, String username) {
+        validateTimeline(request);
         User user = getCurrentUser(username);
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
-
-        validateReservationRequest(request);
+        validateOverlap(request);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -113,10 +113,7 @@ public class ReservationService {
     }
 
     
-    private void validateReservationRequest(ReservationRequest request) {
-        validateTimeline(request);
-        validateOverlap(request);
-    }
+
     private void validateTimeline(ReservationRequest request) {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new ValidationException("Start and end time must not be null");

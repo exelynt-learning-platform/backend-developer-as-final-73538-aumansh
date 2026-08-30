@@ -16,6 +16,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> messageNotReadableHandling(org.springframework.http.converter.HttpMessageNotReadableException exception) {
+        return new ResponseEntity<>(new ErrorResponse("Bad Request", "Malformed JSON request"), HttpStatus.BAD_REQUEST);
+    }
+
+
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorResponse> authenticationHandling(org.springframework.security.core.AuthenticationException exception) {
         return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid username or password"), HttpStatus.UNAUTHORIZED);
