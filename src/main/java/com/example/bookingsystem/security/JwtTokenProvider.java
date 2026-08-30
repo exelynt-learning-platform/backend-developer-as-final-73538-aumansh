@@ -20,7 +20,7 @@ public class JwtTokenProvider {
     private final long jwtExpirationDate;
     private Key cachedKey;
 
-    public JwtTokenProvider(@Value("${jwt.secret:}") String jwtSecret,
+    public JwtTokenProvider(@Value("${jwt.secret}") String jwtSecret,
                             @Value("${jwt.expiration}") long jwtExpirationDate) {
         this.jwtSecret = jwtSecret;
         this.jwtExpirationDate = jwtExpirationDate;
@@ -28,19 +28,14 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        try {
-            if (jwtSecret == null || jwtSecret.isEmpty()) {
-                this.cachedKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-            } else {
-                byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-                if (keyBytes.length < 32) {
-                    throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
-                }
-                this.cachedKey = Keys.hmacShaKeyFor(keyBytes);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT secret key configuration: " + e.getMessage(), e);
+        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
+            throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
+        }
+        this.cachedKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
 
