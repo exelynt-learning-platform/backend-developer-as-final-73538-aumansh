@@ -42,7 +42,7 @@ public class SecurityConfig {
         // CSRF protection is disabled for /auth/** and /api/** because this is a stateless REST API.
         // JWT tokens MUST be sent in the Authorization header and NEVER stored in a cookie.
         // This ensures the application is completely immune to CSRF misuse.
-        http.cors(org.springframework.security.config.Customizer.withDefaults()).csrf(csrf -> csrf.disable()).authorizeHttpRequests(authorize -> authorize
+        http.cors(org.springframework.security.config.Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**", "/api/**")).authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
