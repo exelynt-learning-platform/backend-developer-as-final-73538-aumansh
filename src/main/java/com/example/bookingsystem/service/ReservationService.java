@@ -90,7 +90,6 @@ public class ReservationService {
     }
 
     @Transactional
-    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public void deleteReservation(Long id, String username) {
         User user = getCurrentUser(username);
         Reservation reservation = reservationRepository.findById(id)

@@ -1,6 +1,7 @@
 package com.example.bookingsystem.config;
 
 import com.example.bookingsystem.model.User;
+import com.example.bookingsystem.model.Role;
 import com.example.bookingsystem.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
