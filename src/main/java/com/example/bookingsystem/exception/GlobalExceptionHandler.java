@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<List<ValidationErrorResponse>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<ValidationErrorResponse> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((org.springframework.validation.FieldError) error).getField();
+            String fieldName = error instanceof org.springframework.validation.FieldError ? ((org.springframework.validation.FieldError) error).getField() : error.getObjectName();
             String errorMessage = error.getDefaultMessage();
             errors.add(new ValidationErrorResponse(fieldName, errorMessage));
         });
