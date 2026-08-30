@@ -149,6 +149,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<environmentVariables>
+						<JWT_SECRET>VGhpcyBpcyBhIHRlc3Qgc2VjcmV0IGtleSB0aGF0IG11c3QgYmUgYXQgbGVhc3QgMjU2IGJpdHMgbG9uZw==</JWT_SECRET>
+						<SEED_ADMIN_PASSWORD>admin123</SEED_ADMIN_PASSWORD>
+						<SEED_USER_PASSWORD>user123</SEED_USER_PASSWORD>
+					</environmentVariables>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

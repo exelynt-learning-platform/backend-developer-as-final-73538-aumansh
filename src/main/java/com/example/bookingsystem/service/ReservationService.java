@@ -49,7 +49,7 @@ public class ReservationService {
         reservation.setResource(resource);
         reservation.setStartTime(request.getStartTime());
         reservation.setEndTime(request.getEndTime());
-        reservation.setPrice(request.getPrice());
+        reservation.setPrice(resource.getPrice());
         reservation.setStatus(ReservationStatus.PENDING);
 
         Reservation saved = reservationRepository.save(reservation);
@@ -86,9 +86,6 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (!isAdminOrOwner(user, reservation)) {
-            throw new UnauthorizedException("You do not have permission to delete this reservation");
-        }
         reservationRepository.delete(reservation);
     }
 
