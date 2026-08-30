@@ -24,8 +24,8 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String adminPass = env.getProperty("SEED_ADMIN_PASSWORD", "admin");
-        String userPass = env.getProperty("SEED_USER_PASSWORD", "user");
+        String adminPass = env.getRequiredProperty("SEED_ADMIN_PASSWORD");
+        String userPass = env.getRequiredProperty("SEED_USER_PASSWORD");
         
         if (userRepository.count() == 0) {
             User admin = new User();

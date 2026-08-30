@@ -34,10 +34,15 @@ public class JwtTokenProvider {
         if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
-        if (Decoders.BASE64.decode(jwtSecret).length < MIN_SECRET_LENGTH) {
-            throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
+        try {
+            byte[] decoded = Decoders.BASE64.decode(jwtSecret);
+            if (decoded.length < MIN_SECRET_LENGTH) {
+                throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
+            }
+            this.cachedKey = Keys.hmacShaKeyFor(decoded);
+        } catch (io.jsonwebtoken.io.DecodingException e) {
+            throw new IllegalArgumentException("JWT_SECRET must be a valid BASE64 string.", e);
         }
-        this.cachedKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
 
