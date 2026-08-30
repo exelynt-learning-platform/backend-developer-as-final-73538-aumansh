@@ -72,6 +72,9 @@ public class ReservationService {
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public ReservationResponse updateReservationStatus(Long id, ReservationStatus status) {
+        if (status == null) {
+            throw new ValidationException("Reservation status cannot be null");
+        }
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
         reservation.setStatus(status);
