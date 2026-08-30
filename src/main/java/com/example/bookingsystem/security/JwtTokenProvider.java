@@ -1,4 +1,4 @@
-package com.example.bookingsystem.security;
+﻿package com.example.bookingsystem.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -13,10 +13,10 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("")
+    @Value("${jwt.expiration}")
     private long jwtExpirationDate;
 
     public String generateToken(Authentication authentication) {
@@ -57,3 +57,4 @@ public class JwtTokenProvider {
         }
     }
 }
+

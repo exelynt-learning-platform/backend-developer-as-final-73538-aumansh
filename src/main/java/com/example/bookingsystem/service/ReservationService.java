@@ -105,7 +105,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId())) {
+        if (user.getRole() == Role.ROLE_USER && (reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId()))) {
             throw new UnauthorizedException("You do not have permission to delete this reservation");
         }
         reservationRepository.delete(reservation);
@@ -117,7 +117,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId())) {
+        if (user.getRole() == Role.ROLE_USER && (reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId()))) {
             throw new UnauthorizedException("You do not have permission to view this reservation");
         }
         return mapToDto(reservation);
@@ -142,3 +142,5 @@ public class ReservationService {
 
         return dto;
     }
+
+}
