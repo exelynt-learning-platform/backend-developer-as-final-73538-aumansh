@@ -24,13 +24,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginRequest loginRequest, jakarta.servlet.http.HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = jwtTokenProvider.generateToken(authentication);
+
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("JWT", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
         JwtAuthResponse authResponse = new JwtAuthResponse();
         authResponse.setAccessToken(token);

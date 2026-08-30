@@ -48,6 +48,9 @@ public class JwtTokenProvider {
 
 
     public String generateToken(Authentication authentication) {
+        if (cachedKey == null) {
+            throw new IllegalStateException("JWT Key is not initialized properly");
+        }
         String username = authentication.getName();
         String role = authentication.getAuthorities().isEmpty() ? "" : authentication.getAuthorities().iterator().next().getAuthority();
         Date currentDate = new Date();

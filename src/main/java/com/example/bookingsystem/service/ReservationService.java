@@ -66,7 +66,7 @@ public class ReservationService {
                 
         if (!isAdmin) {
             User user = fetchUserForUsername(username);
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join(USER_FIELD).get("id"), user.getId()));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(USER_FIELD).get("id"), user.getId()));
         }
 
         return reservationRepository.findAll(spec, pageable).map(DtoMapper::mapToReservationDto);
@@ -137,7 +137,7 @@ public class ReservationService {
     }
 
     private boolean isAdmin(User user) {
-        return user != null && user.getRole() == com.example.bookingsystem.model.Role.ROLE_ADMIN;
+        return user != null && user.getRole() == Role.ROLE_ADMIN;
     }
 
     private boolean hasPermission(User user, Reservation reservation) {
