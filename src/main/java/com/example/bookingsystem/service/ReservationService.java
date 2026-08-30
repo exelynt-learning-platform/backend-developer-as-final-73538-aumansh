@@ -72,12 +72,20 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse updateReservationStatus(Long id, ReservationStatus status) {
+    public ReservationResponse updateReservationStatus(Long id, ReservationStatus status, String username) {
         if (status == null) {
             throw new ValidationException("Reservation status cannot be null");
         }
+        User user = fetchUserForUsername(username);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+                
+        if (!isAdmin(user)) {
+            if (!isAdminOrOwner(user, reservation) || status != ReservationStatus.CANCELLED) {
+                throw new UnauthorizedException("You can only cancel your own reservations");
+            }
+        }
+        
         reservation.setStatus(status);
         Reservation updated = reservationRepository.save(reservation);
         return DtoMapper.mapToReservationDto(updated);
@@ -126,9 +134,13 @@ public class ReservationService {
         }
     }
 
+        private boolean isAdmin(User user) {
+        return isAdmin(user);
+    }
+
     private boolean isAdminOrOwner(User user, Reservation reservation) {
         if (user == null || reservation == null) return false;
-        if (user.getRole() == Role.ROLE_ADMIN) return true;
+        if (isAdmin(user)) return true;
         if (reservation.getUser() == null || reservation.getUser().getId() == null) return false;
         return user.getId().equals(reservation.getUser().getId());
     }

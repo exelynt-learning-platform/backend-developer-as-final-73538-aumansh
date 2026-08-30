@@ -14,10 +14,10 @@ public class ReservationRequest {
     @NotNull(message = "Resource ID cannot be null")
     private Long resourceId;
 
-    @NotNull(message = "Start time cannot be null")
+    @NotNull(message = "Start time is required and must be in ISO format")
     private LocalDateTime startTime;
 
-    @NotNull(message = "End time cannot be null")
+    @NotNull(message = "End time is required and must be in ISO format")
     private LocalDateTime endTime;
 
     @NotNull(message = "Price cannot be null")

@@ -17,6 +17,7 @@ import jakarta.annotation.PostConstruct;
 @lombok.extern.slf4j.Slf4j
 public class JwtTokenProvider {
 
+    // Minimum JWT secret length in bytes (256 bits)
     private static final int MIN_SECRET_LENGTH = 32;
 
     private final String jwtSecret;
@@ -31,7 +32,7 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${jwt.secret}")) {
+        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
         try {

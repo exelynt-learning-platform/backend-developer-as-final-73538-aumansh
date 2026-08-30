@@ -154,7 +154,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<environmentVariables>
-						<JWT_SECRET>VGhpcyBpcyBhIHRlc3Qgc2VjcmV0IGtleSB0aGF0IG11c3QgYmUgYXQgbGVhc3QgMjU2IGJpdHMgbG9uZw==</JWT_SECRET>
+						<JWT_SECRET>zYg/b5k1t9/V7xP9B+bC/D3wF6pXlM3yA1sN/W9m0tI=</JWT_SECRET>
 						<SEED_ADMIN_PASSWORD>admin123</SEED_ADMIN_PASSWORD>
 						<SEED_USER_PASSWORD>user123</SEED_USER_PASSWORD>
 						<DB_USERNAME>root</DB_USERNAME>
