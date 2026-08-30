@@ -59,16 +59,17 @@ public class ReservationController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @org.springframework.web.bind.annotation.PutMapping("/{id}/status")
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
             @Valid @RequestBody ReservationStatusRequest request) {
         return ResponseEntity.ok(reservationService.updateReservationStatus(id, request.getStatus()));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
         reservationService.deleteReservation(id, AuthUtil.getUsername(authentication));
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Reservation deleted successfully");
     }
 }

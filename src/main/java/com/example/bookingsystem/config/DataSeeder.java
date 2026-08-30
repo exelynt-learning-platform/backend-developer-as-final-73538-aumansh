@@ -6,35 +6,27 @@ import com.example.bookingsystem.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.core.env.Environment;
 
 @Component
 @lombok.extern.slf4j.Slf4j
 public class DataSeeder implements CommandLineRunner {
 
-    @org.springframework.beans.factory.annotation.Value("${SEED_ADMIN_PASSWORD}")
-    private String adminPass;
-
-    @org.springframework.beans.factory.annotation.Value("${SEED_USER_PASSWORD}")
-    private String userPass;
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Environment env;
 
-    public DataSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DataSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment env) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.env = env;
     }
-
-    
 
     @Override
     public void run(String... args) throws Exception {
-                if (adminPass == null || adminPass.isEmpty()) {
-            throw new RuntimeException("SEED_ADMIN_PASSWORD environment variable is missing.");
-        }
-                if (userPass == null || userPass.isEmpty()) {
-            throw new RuntimeException("SEED_USER_PASSWORD environment variable is missing.");
-        }
+        String adminPass = env.getRequiredProperty("SEED_ADMIN_PASSWORD");
+        String userPass = env.getRequiredProperty("SEED_USER_PASSWORD");
+        
         if (userRepository.count() == 0) {
             User admin = new User();
             admin.setUsername("admin");
