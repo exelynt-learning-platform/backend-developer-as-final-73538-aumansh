@@ -58,10 +58,13 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        User user = fetchUserForUsername(username);
-
         Specification<Reservation> spec = ReservationSpecification.filterReservations(status, minPrice, maxPrice);
-        if (user.getRole() != Role.ROLE_ADMIN) {
+        
+        boolean isAdmin = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                
+        if (!isAdmin) {
+            User user = fetchUserForUsername(username);
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("user").get("id"), user.getId()));
         }
 
