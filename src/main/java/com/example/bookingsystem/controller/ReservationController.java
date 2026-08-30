@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.web.PageableDefault;
 import java.math.BigDecimal;
 
 @RestController
@@ -46,7 +47,7 @@ public class ReservationController {
             @RequestParam(required = false) ReservationStatus status,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @org.springframework.data.web.PageableDefault(size = 10, sort = "id") Pageable pageable,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable,
             Authentication authentication) {
 
         return ResponseEntity.ok(reservationService.getReservations(AuthUtil.getUsername(authentication), status, minPrice, maxPrice, pageable));

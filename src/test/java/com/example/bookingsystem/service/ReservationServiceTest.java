@@ -65,7 +65,7 @@ class ReservationServiceTest {
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
         when(resourceRepository.findById(1L)).thenReturn(Optional.of(resource));
-        when(reservationRepository.countOverlappingReservations(1L, request.getStartTime(), request.getEndTime(), null)).thenReturn(1L);
+        when(reservationRepository.countOverlappingReservations(1L, request.getStartTime(), request.getEndTime(), null, ReservationStatus.CANCELLED)).thenReturn(1L);
 
         com.example.bookingsystem.exception.ValidationException exception = assertThrows(
                 com.example.bookingsystem.exception.ValidationException.class,
@@ -84,7 +84,7 @@ class ReservationServiceTest {
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
         when(resourceRepository.findById(1L)).thenReturn(Optional.of(resource));
-        when(reservationRepository.countOverlappingReservations(1L, request.getStartTime(), request.getEndTime(), null)).thenReturn(0L);
+        when(reservationRepository.countOverlappingReservations(1L, request.getStartTime(), request.getEndTime(), null, ReservationStatus.CANCELLED)).thenReturn(0L);
 
         Reservation saved = new Reservation();
         saved.setId(10L);

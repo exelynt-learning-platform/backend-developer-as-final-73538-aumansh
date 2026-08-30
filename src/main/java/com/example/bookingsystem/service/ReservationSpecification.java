@@ -19,7 +19,7 @@ public final class ReservationSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (user.getRole() == Role.ROLE_USER) {
-                predicates.add(cb.equal(root.get("user").get("id"), user.getId()));
+                predicates.add(cb.equal(root.join("user").get("id"), user.getId()));
             }
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));

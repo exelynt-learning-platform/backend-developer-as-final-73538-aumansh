@@ -23,19 +23,21 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if ("admin123".equals(System.getenv().getOrDefault("SEED_ADMIN_PASSWORD", "admin123"))) {
-            log.warn("WARNING: Using default placeholder seed password for admin. Please change in production.");
+        String adminPass = System.getenv("SEED_ADMIN_PASSWORD");
+        String userPass = System.getenv("SEED_USER_PASSWORD");
+        if (adminPass == null || adminPass.isEmpty() || userPass == null || userPass.isEmpty()) {
+            throw new RuntimeException("SEED_ADMIN_PASSWORD or SEED_USER_PASSWORD environment variables are not set.");
         }
         if (userRepository.count() == 0) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode(System.getenv().getOrDefault("SEED_ADMIN_PASSWORD", "admin123")));
+            admin.setPassword(passwordEncoder.encode(adminPass));
             admin.setRole(Role.ROLE_ADMIN);
             userRepository.save(admin);
 
             User user = new User();
             user.setUsername("user");
-            user.setPassword(passwordEncoder.encode(System.getenv().getOrDefault("SEED_USER_PASSWORD", "user123")));
+            user.setPassword(passwordEncoder.encode(userPass));
             user.setRole(Role.ROLE_USER);
             userRepository.save(user);
         }
