@@ -57,11 +57,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+    public Page<ReservationResponse> getReservations(String username, boolean isAdmin, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         Specification<Reservation> spec = ReservationSpecification.filterReservations(status, minPrice, maxPrice);
-        
-        boolean isAdmin = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
                 
         if (!isAdmin) {
             User user = fetchUserForUsername(username);
@@ -80,10 +77,11 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
                 
-        if (!isAdmin(user)) {
-            if (!isAdminOrOwner(user, reservation) || status != ReservationStatus.CANCELLED) {
-                throw new UnauthorizedException("You can only cancel your own reservations");
-            }
+        if (!hasPermission(user, reservation)) {
+            throw new UnauthorizedException("You do not have permission for this reservation");
+        }
+        if (!isAdmin(user) && status != ReservationStatus.CANCELLED) {
+            throw new UnauthorizedException("You can only cancel your own reservations");
         }
         
         reservation.setStatus(status);
@@ -97,7 +95,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (!isAdminOrOwner(user, reservation)) {
+        if (!hasPermission(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to delete this reservation");
         }
         reservationRepository.delete(reservation);
@@ -108,7 +106,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (!isAdminOrOwner(user, reservation)) {
+        if (!hasPermission(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to view this reservation");
         }
         return DtoMapper.mapToReservationDto(reservation);
@@ -134,11 +132,11 @@ public class ReservationService {
         }
     }
 
-        private boolean isAdmin(User user) {
-        return isAdmin(user);
+    private boolean isAdmin(User user) {
+        return user != null && user.getRole() == com.example.bookingsystem.model.Role.ROLE_ADMIN;
     }
 
-    private boolean isAdminOrOwner(User user, Reservation reservation) {
+    private boolean hasPermission(User user, Reservation reservation) {
         if (user == null || reservation == null) return false;
         if (isAdmin(user)) return true;
         if (reservation.getUser() == null || reservation.getUser().getId() == null) return false;

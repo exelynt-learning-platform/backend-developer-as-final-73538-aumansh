@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.core.env.Environment;
 
 @Component
-@lombok.extern.slf4j.Slf4j
 public class DataSeeder implements CommandLineRunner {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DataSeeder.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,11 +29,13 @@ public class DataSeeder implements CommandLineRunner {
         if (adminPass == null || adminPass.isEmpty()) {
             adminPass = java.util.UUID.randomUUID().toString();
             log.info("Temporary SEED_ADMIN_PASSWORD generated securely but not logged for security reasons.");
+            if (log.isDebugEnabled()) { log.debug("Temporary SEED_ADMIN_PASSWORD generated: {}", adminPass); }
         }
         String userPass = env.getProperty("SEED_USER_PASSWORD");
         if (userPass == null || userPass.isEmpty()) {
             userPass = java.util.UUID.randomUUID().toString();
             log.info("Temporary SEED_USER_PASSWORD generated securely but not logged for security reasons.");
+            if (log.isDebugEnabled()) { log.debug("Temporary SEED_USER_PASSWORD generated: {}", userPass); }
         }
         
         if (userRepository.findByUsername("admin").isEmpty()) {
