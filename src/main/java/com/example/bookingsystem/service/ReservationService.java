@@ -46,10 +46,10 @@ public class ReservationService {
 
 
         if (request.getStartTime() == null || request.getEndTime() == null) {
-            throw new com.example.bookingsystem.exception.ValidationException("Start and end time must not be null");
+            throw new ValidationException("Start and end time must not be null");
         }
         if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new com.example.bookingsystem.exception.ValidationException("Start time must be before end time");
+            throw new ValidationException("Start time must be before end time");
         }
 
         Reservation reservation = new Reservation();
