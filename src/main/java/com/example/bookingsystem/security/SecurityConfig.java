@@ -45,6 +45,7 @@ public class SecurityConfig {
         http.cors(org.springframework.security.config.Customizer.withDefaults()).csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**", "/api/**")).authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/resources/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
