@@ -25,7 +25,6 @@ import java.util.List;
 import jakarta.persistence.criteria.Predicate;
 
 @Service
-@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -40,6 +39,7 @@ public class ReservationService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public ReservationResponse createReservation(ReservationRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -91,6 +91,7 @@ public class ReservationService {
         return reservationRepository.findAll(spec, pageable).map(this::mapToDto);
     }
 
+    @Transactional
     public ReservationResponse updateReservationStatus(Long id, ReservationStatus status) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
@@ -99,6 +100,7 @@ public class ReservationService {
         return mapToDto(updated);
     }
 
+    @Transactional
     public void deleteReservation(Long id, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
