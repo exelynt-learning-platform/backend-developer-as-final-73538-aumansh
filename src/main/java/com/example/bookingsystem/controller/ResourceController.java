@@ -51,8 +51,8 @@ public class ResourceController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteResource(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
         resourceService.deleteResource(id);
-        return ResponseEntity.ok("Resource deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 }
