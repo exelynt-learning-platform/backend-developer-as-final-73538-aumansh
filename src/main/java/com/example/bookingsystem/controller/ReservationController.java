@@ -59,12 +59,12 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getReservationById(id, AuthUtil.getUsername(authentication)));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
-            @Valid @RequestBody ReservationStatusRequest request) {
-        return ResponseEntity.ok(reservationService.updateReservationStatus(id, request.getStatus()));
+            @Valid @RequestBody ReservationStatusRequest request,
+            Authentication authentication) {
+        return ResponseEntity.ok(reservationService.updateReservationStatus(id, request.getStatus(), AuthUtil.getUsername(authentication)));
     }
 
     @DeleteMapping("/{id}")
