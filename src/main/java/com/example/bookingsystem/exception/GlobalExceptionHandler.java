@@ -10,7 +10,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler {    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<?> accessDeniedHandling(org.springframework.security.access.AccessDeniedException exception) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", new Date());
+        body.put("message", "Access denied");
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+    
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<?> validationHandling(ValidationException exception) {
         Map<String, Object> body = new LinkedHashMap<>();

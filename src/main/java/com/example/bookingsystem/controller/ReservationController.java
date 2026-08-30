@@ -21,10 +21,7 @@ import java.math.BigDecimal;
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
-    private String getUsername(Authentication authentication) {
-        if (authentication == null || authentication.getName() == null) {
-            throw new org.springframework.security.access.AccessDeniedException("User is not authenticated");
-        }
+
         return authentication.getName();
     }
 
@@ -39,7 +36,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @Valid @RequestBody ReservationRequest request,
             Authentication authentication) {
-        return new ResponseEntity<>(reservationService.createReservation(request, getUsername(authentication)), HttpStatus.CREATED);
+        return new ResponseEntity<>(reservationService.createReservation(request, com.example.bookingsystem.security.AuthUtil.getUsername(authentication)), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -55,12 +52,12 @@ public class ReservationController {
         
         Pageable pageable = PaginationUtil.createPageable(page, size, sortBy, sortDir);
 
-        return ResponseEntity.ok(reservationService.getReservations(getUsername(authentication), status, minPrice, maxPrice, pageable));
+        return ResponseEntity.ok(reservationService.getReservations(com.example.bookingsystem.security.AuthUtil.getUsername(authentication), status, minPrice, maxPrice, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getReservationById(@PathVariable Long id, Authentication authentication) {
-        return ResponseEntity.ok(reservationService.getReservationById(id, getUsername(authentication)));
+        return ResponseEntity.ok(reservationService.getReservationById(id, com.example.bookingsystem.security.AuthUtil.getUsername(authentication)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -73,7 +70,7 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
-        reservationService.deleteReservation(id, getUsername(authentication));
+        reservationService.deleteReservation(id, com.example.bookingsystem.security.AuthUtil.getUsername(authentication));
         return ResponseEntity.ok("Reservation deleted successfully");
     }
 }
