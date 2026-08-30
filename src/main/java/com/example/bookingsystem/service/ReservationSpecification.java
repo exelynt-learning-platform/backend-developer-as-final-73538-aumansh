@@ -11,7 +11,7 @@ import jakarta.persistence.criteria.Predicate;
 
 public class ReservationSpecification {
 
-    private static final String USER_FIELD = "user";
+    public static final String USER_FIELD = "user";
 
     public static Specification<Reservation> filterReservations(ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice) {
         return (root, query, criteriaBuilder) -> {

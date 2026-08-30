@@ -27,11 +27,13 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String adminPass = env.getProperty("SEED_ADMIN_PASSWORD");
         if (adminPass == null || adminPass.isEmpty()) {
-            adminPass = "admin123";
+            adminPass = java.util.UUID.randomUUID().toString();
+            log.info("GENERATED RANDOM SEED_ADMIN_PASSWORD: {}", adminPass);
         }
         String userPass = env.getProperty("SEED_USER_PASSWORD");
         if (userPass == null || userPass.isEmpty()) {
-            userPass = "user123";
+            userPass = java.util.UUID.randomUUID().toString();
+            log.info("GENERATED RANDOM SEED_USER_PASSWORD: {}", userPass);
         }
         
         if (userRepository.findByUsername("admin").isEmpty()) {

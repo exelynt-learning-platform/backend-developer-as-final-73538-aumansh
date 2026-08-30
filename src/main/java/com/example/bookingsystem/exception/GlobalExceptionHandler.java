@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public org.springframework.http.ResponseEntity<com.example.bookingsystem.dto.ErrorResponse> handleGlobalException(Exception ex) {
-        logger.error("Unhandled exception: {}", ex.getMessage());
+        logger.error("Unhandled exception: ", ex);
         return new org.springframework.http.ResponseEntity<>(new com.example.bookingsystem.dto.ErrorResponse("Internal Server Error", "An unexpected error occurred"), org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
