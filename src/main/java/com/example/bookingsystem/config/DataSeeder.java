@@ -25,21 +25,21 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String adminPass = System.getenv("SEED_ADMIN_PASSWORD");
         if (adminPass == null || adminPass.isEmpty()) {
-            adminPass = java.util.UUID.randomUUID().toString();
+            adminPass = "admin123";
             System.out.println("=================================================");
             System.out.println("WARNING: SEED_ADMIN_PASSWORD not set!");
-            System.out.println("Generated temporary ADMIN password: " + adminPass);
+            System.out.println("Using fixed default ADMIN password: " + adminPass);
+            System.out.println("DO NOT USE THIS IN PRODUCTION!");
             System.out.println("=================================================");
-            
         }
         String userPass = System.getenv("SEED_USER_PASSWORD");
         if (userPass == null || userPass.isEmpty()) {
-            userPass = java.util.UUID.randomUUID().toString();
+            userPass = "user123";
             System.out.println("=================================================");
             System.out.println("WARNING: SEED_USER_PASSWORD not set!");
-            System.out.println("Generated temporary USER password: " + userPass);
+            System.out.println("Using fixed default USER password: " + userPass);
+            System.out.println("DO NOT USE THIS IN PRODUCTION!");
             System.out.println("=================================================");
-            
         }
         if (userRepository.count() == 0) {
             User admin = new User();
