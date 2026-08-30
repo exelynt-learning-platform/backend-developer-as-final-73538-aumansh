@@ -7,6 +7,8 @@ import com.example.bookingsystem.repository.ResourceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,11 +28,11 @@ public class ResourceService {
         return mapToDto(saved);
     }
 
-    public List<ResourceDto> getAllResources() {
-        return resourceRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    
+    public Page<ResourceDto> getAllResources(Pageable pageable) {
+        return resourceRepository.findAll(pageable).map(this::mapToDto);
     }
+
 
     public ResourceDto getResourceById(Long id) {
         Resource resource = resourceRepository.findById(id)
