@@ -16,27 +16,27 @@ public class GlobalExceptionHandler {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<?> accessDeniedHandling(org.springframework.security.access.AccessDeniedException exception) {
+    public ResponseEntity<ErrorResponse> accessDeniedHandling(org.springframework.security.access.AccessDeniedException exception) {
         return new ResponseEntity<>(new ErrorResponse("Forbidden", "Access denied"), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<?> validationHandling(ValidationException exception) {
+    public ResponseEntity<ErrorResponse> validationHandling(ValidationException exception) {
         return new ResponseEntity<>(new ErrorResponse("Bad Request", exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> resourceNotFoundHandling(ResourceNotFoundException exception) {
+    public ResponseEntity<ErrorResponse> resourceNotFoundHandling(ResourceNotFoundException exception) {
         return new ResponseEntity<>(new ErrorResponse("Not Found", exception.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<?> unauthorizedHandling(UnauthorizedException exception) {
+    public ResponseEntity<ErrorResponse> unauthorizedHandling(UnauthorizedException exception) {
         return new ResponseEntity<>(new ErrorResponse("Forbidden", exception.getMessage()), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> errors = new LinkedHashMap<>();
         errors.put("timestamp", new Date());
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandling(Exception exception) {
+    public ResponseEntity<ErrorResponse> globalExceptionHandling(Exception exception) {
         logger.error("An unexpected error occurred", exception);
         return new ResponseEntity<>(new ErrorResponse("Internal Server Error", "An unexpected error occurred. Please try again later."), HttpStatus.INTERNAL_SERVER_ERROR);
     }

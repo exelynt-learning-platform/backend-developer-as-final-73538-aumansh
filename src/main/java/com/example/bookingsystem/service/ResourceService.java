@@ -24,19 +24,19 @@ public class ResourceService {
         resource.setDescription(resourceDto.getDescription());
         resource.setPrice(resourceDto.getPrice());
         Resource saved = resourceRepository.save(resource);
-        return mapToDto(saved);
+        return DtoMapper.mapToResourceDto(saved);
     }
 
     
     public Page<ResourceDto> getAllResources(Pageable pageable) {
-        return resourceRepository.findAll(pageable).map(this::mapToDto);
+        return resourceRepository.findAll(pageable).map(DtoMapper::mapToResourceDto);
     }
 
 
     public ResourceDto getResourceById(Long id) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return mapToDto(resource);
+        return DtoMapper.mapToResourceDto(resource);
     }
 
     public ResourceDto updateResource(Long id, ResourceDto resourceDto) {
@@ -46,7 +46,7 @@ public class ResourceService {
         resource.setDescription(resourceDto.getDescription());
         resource.setPrice(resourceDto.getPrice());
         Resource updated = resourceRepository.save(resource);
-        return mapToDto(updated);
+        return DtoMapper.mapToResourceDto(updated);
     }
 
     public void deleteResource(Long id) {
@@ -55,12 +55,5 @@ public class ResourceService {
         resourceRepository.delete(resource);
     }
 
-    private ResourceDto mapToDto(Resource resource) {
-        ResourceDto dto = new ResourceDto();
-        dto.setId(resource.getId());
-        dto.setName(resource.getName());
-        dto.setDescription(resource.getDescription());
-        dto.setPrice(resource.getPrice());
-        return dto;
-    }
+
 }

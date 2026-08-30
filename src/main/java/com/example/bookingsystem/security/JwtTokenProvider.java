@@ -32,17 +32,10 @@ public class JwtTokenProvider {
         if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
-        if ("local_dev_secret_key_which_must_be_at_least_256_bits_long".equals(jwtSecret)) {
-            log.warn("WARNING: Using default developer JWT secret. Do not use in production.");
-        }
-        if (false) {
-            throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
-        }
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        if (keyBytes.length < 32) {
+        if (Decoders.BASE64.decode(jwtSecret).length < 32) {
             throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
         }
-        this.cachedKey = Keys.hmacShaKeyFor(keyBytes);
+        this.cachedKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
 
