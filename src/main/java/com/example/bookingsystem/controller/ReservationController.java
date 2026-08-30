@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,14 +60,13 @@ public class ReservationController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @org.springframework.web.bind.annotation.PatchMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
             @Valid @RequestBody ReservationStatusRequest request) {
         return ResponseEntity.ok(reservationService.updateReservationStatus(id, request.getStatus()));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
         reservationService.deleteReservation(id, AuthUtil.getUsername(authentication));
