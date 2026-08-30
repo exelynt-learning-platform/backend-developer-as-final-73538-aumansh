@@ -32,7 +32,7 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
-        String role = authentication.getAuthorities().stream().findFirst().map(GrantedAuthority::getAuthority).orElse("OTHER");
+        String role = authentication.getAuthorities().iterator().next().getAuthority();
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationDate);
 

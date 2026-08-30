@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReservationSpecification {
+public final class ReservationSpecification {
+    private ReservationSpecification() {}
+
     public static Specification<Reservation> filterReservations(User user, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
