@@ -2,6 +2,7 @@ package com.example.bookingsystem.dto;
 
 import java.time.LocalDateTime;
 
+@lombok.Getter
 public class ValidationErrorResponse {
     private String field;
     private String message;
@@ -13,7 +14,5 @@ public class ValidationErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 
-    public String getField() { return field; }
-    public String getMessage() { return message; }
-    public LocalDateTime getTimestamp() { return timestamp; }
+            public LocalDateTime getTimestamp() { return timestamp; }
 }
