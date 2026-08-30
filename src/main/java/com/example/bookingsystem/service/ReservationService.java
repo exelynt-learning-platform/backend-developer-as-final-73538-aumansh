@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -46,6 +44,10 @@ public class ReservationService {
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
+
+        if (request.getStartTime() == null || request.getEndTime() == null) {
+            throw new com.example.bookingsystem.exception.ValidationException("Start and end time must not be null");
+        }
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new com.example.bookingsystem.exception.ValidationException("Start time must be before end time");
         }
@@ -71,6 +73,7 @@ public class ReservationService {
         return reservationRepository.findAll(spec, pageable).map(this::mapToDto);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public ReservationResponse updateReservationStatus(Long id, ReservationStatus status) {
         Reservation reservation = reservationRepository.findById(id)
@@ -107,10 +110,11 @@ public class ReservationService {
 
     
     private boolean isAdminOrOwner(User user, Reservation reservation) {
+        if (user == null || reservation == null) return false;
         if (user.getRole() == Role.ROLE_ADMIN) {
             return true;
         }
-        return reservation.getUser() != null && reservation.getUser().getId().equals(user.getId());
+        return reservation.getUser() != null && user.getId().equals(reservation.getUser().getId());
     }
 
     private ReservationResponse mapToDto(Reservation reservation) {
