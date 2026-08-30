@@ -39,7 +39,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http/* CSRF is disabled for /auth/** and /api/** because the API is fully stateless and utilizes JWT-based authentication, which is not vulnerable to CSRF when not stored in cookies. */
+        // CSRF is disabled for /auth/** and /api/** because the API is fully stateless and utilizes JWT-based authentication, which is not vulnerable to CSRF when not stored in cookies.
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**", "/api/**")).authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()

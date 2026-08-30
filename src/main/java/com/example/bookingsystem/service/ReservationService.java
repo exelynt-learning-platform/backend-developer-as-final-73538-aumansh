@@ -57,7 +57,7 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.PENDING);
 
         Reservation saved = reservationRepository.save(reservation);
-        return mapToDto(saved);
+        return DtoMapper.mapToReservationDto(saved);
     }
 
     public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
@@ -66,7 +66,7 @@ public class ReservationService {
 
         Specification<Reservation> spec = ReservationSpecification.filterReservations(user, status, minPrice, maxPrice);
 
-        return reservationRepository.findAll(spec, pageable).map(this::mapToDto);
+        return reservationRepository.findAll(spec, pageable).map(DtoMapper::mapToReservationDto);
     }
 
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
@@ -79,7 +79,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
         reservation.setStatus(status);
         Reservation updated = reservationRepository.save(reservation);
-        return mapToDto(updated);
+        return DtoMapper.mapToReservationDto(updated);
     }
 
     @Transactional
@@ -104,7 +104,7 @@ public class ReservationService {
         if (!isAdminOrOwner(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to view this reservation");
         }
-        return mapToDto(reservation);
+        return DtoMapper.mapToReservationDto(reservation);
     }
 
     
@@ -115,7 +115,7 @@ public class ReservationService {
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new ValidationException("Start time must be before end time");
         }
-        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), excludedId) > 0) {
+        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), excludedId, ReservationStatus.CANCELLED) > 0) {
             throw new ValidationException("Reservation overlaps with an existing booking");
         }
     }
@@ -127,18 +127,6 @@ public class ReservationService {
         return user.getId().equals(reservation.getUser().getId());
     }
 
-    private ReservationResponse mapToDto(Reservation reservation) {
-        ReservationResponse dto = new ReservationResponse();
-        org.springframework.beans.BeanUtils.copyProperties(reservation, dto);
-        if (reservation.getUser() != null) {
-            dto.setUserId(reservation.getUser().getId());
-        }
-        if (reservation.getResource() != null) {
-            ResourceDto resourceDto = new ResourceDto();
-            org.springframework.beans.BeanUtils.copyProperties(reservation.getResource(), resourceDto);
-            dto.setResource(resourceDto);
-        }
-        return dto;
-    }
+
 
 }
