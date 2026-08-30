@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.persistence.criteria.Predicate;
+
 
 @Service
 public class ReservationService {
@@ -47,7 +47,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
         if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new IllegalArgumentException("Start time must be before end time");
+            throw new com.example.bookingsystem.exception.ValidationException("Start time must be before end time");
         }
 
         Reservation reservation = new Reservation();
@@ -66,27 +66,7 @@ public class ReservationService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Specification<Reservation> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            if (user.getRole() == Role.ROLE_USER) {
-                predicates.add(cb.equal(root.get("user").get("id"), user.getId()));
-            }
-
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
-            }
-
-            if (minPrice != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
-            }
-
-            if (maxPrice != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Reservation> spec = ReservationSpecification.filterReservations(user, status, minPrice, maxPrice);
 
         return reservationRepository.findAll(spec, pageable).map(this::mapToDto);
     }

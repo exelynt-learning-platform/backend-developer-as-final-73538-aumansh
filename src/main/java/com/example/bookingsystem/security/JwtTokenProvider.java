@@ -58,7 +58,7 @@ public class JwtTokenProvider {
             Jwts.parserBuilder()
                     .setSigningKey(cachedKey)
                     .build()
-                    .parse(token);
+                    .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;

@@ -22,10 +22,10 @@ import java.math.BigDecimal;
 public class ReservationController {
 
     private String getUsername(Authentication authentication) {
-        if (authentication == null || getUsername(authentication) == null) {
+        if (authentication == null || authentication.getName() == null) {
             throw new org.springframework.security.access.AccessDeniedException("User is not authenticated");
         }
-        return getUsername(authentication);
+        return authentication.getName();
     }
 
 
