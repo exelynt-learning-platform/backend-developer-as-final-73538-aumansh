@@ -50,7 +50,7 @@ public class ReservationService {
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
-        validateTimeline(request);
+        validateReservationTimes(request);
         validateOverlap(request);
 
         Reservation reservation = new Reservation();
@@ -114,7 +114,7 @@ public class ReservationService {
 
     
 
-    private void validateTimeline(ReservationRequest request) {
+    private void validateReservationTimes(ReservationRequest request) {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new ValidationException("Start and end time must not be null");
         }

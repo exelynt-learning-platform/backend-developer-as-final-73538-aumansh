@@ -24,7 +24,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorResponse> authenticationHandling(org.springframework.security.core.AuthenticationException exception) {
-        return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid username or password"), HttpStatus.UNAUTHORIZED);
+        logger.error("Authentication failed: {}", exception.getMessage());
+        return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid credentials"), HttpStatus.UNAUTHORIZED);
     }
 
 
