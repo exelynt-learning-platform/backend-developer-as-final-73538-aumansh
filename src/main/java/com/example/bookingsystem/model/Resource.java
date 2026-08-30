@@ -1,7 +1,6 @@
 package com.example.bookingsystem.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Column;
 import java.math.BigDecimal;
 import lombok.*;
 
