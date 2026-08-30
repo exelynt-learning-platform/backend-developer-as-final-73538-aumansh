@@ -27,13 +27,13 @@ A RESTful Resource Booking System built with Spring Boot, Java 17+, Spring Secur
 
 2. **Database Configuration:**
    By default, the application is configured to connect to a MySQL database named booking_db at localhost:3306 using the username 
-oot and password password. The database will be created automatically if it doesn't exist.
+oot and your_db_password your_db_password. The database will be created automatically if it doesn't exist.
 
    You can override these settings using environment variables:
 
    - DB_URL : The JDBC URL (e.g., jdbc:mysql://localhost:3306/your_db?createDatabaseIfNotExist=true)
    - DB_USERNAME : Your database username
-   - DB_PASSWORD : Your database password
+   - DB_PASSWORD : Your database your_db_password
    - JWT_SECRET : Your JWT secret key (must be at least 256 bits/32 bytes)
 
 3. **Run the Application:**

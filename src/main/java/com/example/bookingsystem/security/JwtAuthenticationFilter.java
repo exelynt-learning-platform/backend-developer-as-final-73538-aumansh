@@ -60,8 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } else {
             SecurityContextHolder.clearContext();
-            authenticationEntryPoint.commence(request, response, new org.springframework.security.authentication.AuthenticationServiceException("Invalid JWT token"));
-            return;
         }
 
         filterChain.doFilter(request, response);

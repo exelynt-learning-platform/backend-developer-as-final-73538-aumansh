@@ -8,11 +8,5 @@ public class ReservationStatusRequest {
     @NotNull(message = "Status cannot be null")
     private ReservationStatus status;
 
-    public ReservationStatus getStatus() {
-        return status;
+    
     }
-
-    public void setStatus(ReservationStatus status) {
-        this.status = status;
-    }
-}

@@ -14,7 +14,4 @@ public class ErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 
-    public String getError() { return error; }
-    public String getMessage() { return message; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-}
+            }
