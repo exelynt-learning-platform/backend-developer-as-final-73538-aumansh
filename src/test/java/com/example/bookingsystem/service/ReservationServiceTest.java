@@ -56,15 +56,35 @@ class ReservationServiceTest {
     }
 
     @Test
+    void createReservation_Overlapping() {
+        ReservationRequest request = new ReservationRequest();
+        request.setResourceId(1L);
+        request.setStartTime(LocalDateTime.now().plusDays(1));
+        request.setEndTime(LocalDateTime.now().plusDays(2));
+        request.setPrice(BigDecimal.TEN);
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(resourceRepository.findById(1L)).thenReturn(Optional.of(resource));
+        when(reservationRepository.countOverlappingReservations(1L, request.getStartTime(), request.getEndTime())).thenReturn(1L);
+
+        com.example.bookingsystem.exception.ValidationException exception = assertThrows(
+                com.example.bookingsystem.exception.ValidationException.class,
+                () -> reservationService.createReservation(request, "testuser")
+        );
+        assertEquals("Reservation overlaps with an existing booking", exception.getMessage());
+    }
+
+    @Test
     void createReservation_Success() {
         ReservationRequest request = new ReservationRequest();
         request.setResourceId(1L);
         request.setStartTime(LocalDateTime.now().plusDays(1));
         request.setEndTime(LocalDateTime.now().plusDays(2));
-        request.setPrice(BigDecimal.TAN);
+        request.setPrice(BigDecimal.TEN);
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
         when(resourceRepository.findById(1L)).thenReturn(Optional.of(resource));
+        when(reservationRepository.countOverlappingReservations(1L, request.getStartTime(), request.getEndTime())).thenReturn(0L);
 
         Reservation saved = new Reservation();
         saved.setId(10L);
@@ -82,5 +102,44 @@ class ReservationServiceTest {
         assertNotNull(response);
         assertEquals(10L, response.getId());
         assertEquals(ReservationStatus.PENDING, response.getStatus());
+    }
+    
+    @Test
+    void getReservationById_Success() {
+        Reservation res = new Reservation();
+        res.setId(10L);
+        res.setUser(user);
+        res.setResource(resource);
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(reservationRepository.findById(10L)).thenReturn(Optional.of(res));
+
+        ReservationResponse response = reservationService.getReservationById(10L, "testuser");
+        assertNotNull(response);
+    }
+
+    @Test
+    void deleteReservation_Success() {
+        Reservation res = new Reservation();
+        res.setId(10L);
+        res.setUser(user);
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(reservationRepository.findById(10L)).thenReturn(Optional.of(res));
+
+        assertDoesNotThrow(() -> reservationService.deleteReservation(10L, "testuser"));
+    }
+
+    @Test
+    void updateReservationStatus_Success() {
+        Reservation res = new Reservation();
+        res.setId(10L);
+        res.setStatus(ReservationStatus.PENDING);
+
+        when(reservationRepository.findById(10L)).thenReturn(Optional.of(res));
+        when(reservationRepository.save(any())).thenReturn(res);
+
+        ReservationResponse response = reservationService.updateReservationStatus(10L, ReservationStatus.CONFIRMED);
+        assertEquals(ReservationStatus.CONFIRMED, response.getStatus());
     }
 }

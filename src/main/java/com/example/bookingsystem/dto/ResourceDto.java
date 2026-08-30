@@ -13,4 +13,5 @@ public class ResourceDto {
     private String name;
 
     private String description;
+    private java.math.BigDecimal price;
 }
