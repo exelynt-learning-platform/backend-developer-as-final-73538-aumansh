@@ -24,6 +24,10 @@ import java.math.BigDecimal;
 @Service
 public class ReservationService {
 
+    private static final String USER_FIELD = "user";
+    private static final String PERMISSION_DENIED_MSG = "You do not have permission";
+
+
     private final ReservationRepository reservationRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
@@ -62,7 +66,7 @@ public class ReservationService {
                 
         if (!isAdmin) {
             User user = fetchUserForUsername(username);
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("user").get("id"), user.getId()));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join(USER_FIELD).get("id"), user.getId()));
         }
 
         return reservationRepository.findAll(spec, pageable).map(DtoMapper::mapToReservationDto);
@@ -78,7 +82,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
                 
         if (!hasPermission(user, reservation)) {
-            throw new UnauthorizedException("You do not have permission for this reservation");
+            throw new UnauthorizedException(PERMISSION_DENIED_MSG + " for this reservation");
         }
         if (!isAdmin(user) && status != ReservationStatus.CANCELLED) {
             throw new UnauthorizedException("You can only cancel your own reservations");
@@ -96,7 +100,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
         if (!hasPermission(user, reservation)) {
-            throw new UnauthorizedException("You do not have permission to delete this reservation");
+            throw new UnauthorizedException(PERMISSION_DENIED_MSG + " to delete this reservation");
         }
         reservationRepository.delete(reservation);
     }
@@ -107,7 +111,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
         if (!hasPermission(user, reservation)) {
-            throw new UnauthorizedException("You do not have permission to view this reservation");
+            throw new UnauthorizedException(PERMISSION_DENIED_MSG + " to view this reservation");
         }
         return DtoMapper.mapToReservationDto(reservation);
     }
@@ -137,9 +141,7 @@ public class ReservationService {
     }
 
     private boolean hasPermission(User user, Reservation reservation) {
-        if (user == null || reservation == null) return false;
-        if (isAdmin(user)) return true;
-        if (reservation.getUser() == null || reservation.getUser().getId() == null) return false;
-        return user.getId().equals(reservation.getUser().getId());
+        return user != null && reservation != null && 
+               (isAdmin(user) || (reservation.getUser() != null && user.getId().equals(reservation.getUser().getId())));
     }
 }

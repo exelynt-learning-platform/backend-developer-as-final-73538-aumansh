@@ -27,7 +27,7 @@ public class ResourceController {
     
     @GetMapping
     public ResponseEntity<Page<ResourceDto>> getAllResources(
-            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+            @PageableDefault(size = 10, sort = {"id"}) Pageable pageable) {
         return ResponseEntity.ok(resourceService.getAllResources(pageable));
     }
 
