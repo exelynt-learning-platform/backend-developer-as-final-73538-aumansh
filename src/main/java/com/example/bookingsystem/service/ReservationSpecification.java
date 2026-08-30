@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Uses the Specification pattern to dynamically build JPA queries for filtering reservations.
+ */
 public final class ReservationSpecification {
     private ReservationSpecification() {}
 

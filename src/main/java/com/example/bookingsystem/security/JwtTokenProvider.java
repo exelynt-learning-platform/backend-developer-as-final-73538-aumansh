@@ -17,6 +17,8 @@ import jakarta.annotation.PostConstruct;
 @lombok.extern.slf4j.Slf4j
 public class JwtTokenProvider {
 
+    private static final int MIN_SECRET_LENGTH = 32;
+
     private final String jwtSecret;
     private final long jwtExpirationDate;
     private Key cachedKey;
@@ -32,7 +34,7 @@ public class JwtTokenProvider {
         if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
-        if (Decoders.BASE64.decode(jwtSecret).length < 32) {
+        if (Decoders.BASE64.decode(jwtSecret).length < MIN_SECRET_LENGTH) {
             throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
         }
         this.cachedKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));

@@ -2,7 +2,6 @@ package com.example.bookingsystem.service;
 
 import com.example.bookingsystem.dto.ReservationRequest;
 import com.example.bookingsystem.dto.ReservationResponse;
-import com.example.bookingsystem.dto.ResourceDto;
 import com.example.bookingsystem.exception.ResourceNotFoundException;
 import com.example.bookingsystem.exception.UnauthorizedException;
 import com.example.bookingsystem.model.Reservation;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-
 @Service
 public class ReservationService {
 
@@ -38,15 +36,8 @@ public class ReservationService {
         this.userRepository = userRepository;
     }
 
-    @Transactional
-    
-    private User getCurrentUser(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
-    }
-
     public ReservationResponse createReservation(ReservationRequest request, String username) {
-        User user = getCurrentUser(username);
+        User user = fetchUserForUsername(username);
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
@@ -65,8 +56,9 @@ public class ReservationService {
         return DtoMapper.mapToReservationDto(saved);
     }
 
+    @Transactional(readOnly = true)
     public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        User user = getCurrentUser(username);
+        User user = fetchUserForUsername(username);
 
         Specification<Reservation> spec = ReservationSpecification.filterReservations(status, minPrice, maxPrice);
         if (user.getRole() != Role.ROLE_ADMIN) {
@@ -76,7 +68,6 @@ public class ReservationService {
         return reservationRepository.findAll(spec, pageable).map(DtoMapper::mapToReservationDto);
     }
 
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public ReservationResponse updateReservationStatus(Long id, ReservationStatus status) {
         if (status == null) {
@@ -91,7 +82,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservation(Long id, String username) {
-        User user = getCurrentUser(username);
+        User user = fetchUserForUsername(username);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
@@ -100,9 +91,9 @@ public class ReservationService {
         }
         reservationRepository.delete(reservation);
     }
-    
+
     public ReservationResponse getReservationById(Long id, String username) {
-        User user = getCurrentUser(username);
+        User user = fetchUserForUsername(username);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
@@ -112,7 +103,10 @@ public class ReservationService {
         return DtoMapper.mapToReservationDto(reservation);
     }
 
-    
+    private User fetchUserForUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+    }
 
     private void validateReservationTimes(ReservationRequest request) {
         if (request.getStartTime() == null || request.getEndTime() == null) {
@@ -122,19 +116,17 @@ public class ReservationService {
             throw new ValidationException("Start time must be before end time");
         }
     }
+
     private void validateOverlap(ReservationRequest request) {
         if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), ReservationStatus.CANCELLED) > 0) {
             throw new ValidationException("Reservation overlaps with an existing booking");
         }
     }
-    
+
     private boolean isAdminOrOwner(User user, Reservation reservation) {
         if (user == null || reservation == null) return false;
         if (user.getRole() == Role.ROLE_ADMIN) return true;
         if (reservation.getUser() == null || reservation.getUser().getId() == null) return false;
         return user.getId().equals(reservation.getUser().getId());
     }
-
-
-
 }

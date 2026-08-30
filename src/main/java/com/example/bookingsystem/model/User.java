@@ -19,6 +19,7 @@ public class User {
     private String username;
 
     @Column(nullable = false)
+    // Passwords must always be hashed using BCrypt before storing in the database
     private String password;
 
     @Enumerated(EnumType.STRING)
