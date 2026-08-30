@@ -39,14 +39,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(ReservationRequest request, String username) {
-        User user = userRepository.findByUsername(username)
+    
+    private User getCurrentUser(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
+    }
+
+    public ReservationResponse createReservation(ReservationRequest request, String username) {
+        User user = getCurrentUser(username);
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
 
-        validateReservationRequest(request, null);
+        validateReservationRequest(request);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -61,8 +66,7 @@ public class ReservationService {
     }
 
     public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+        User user = getCurrentUser(username);
 
         Specification<Reservation> spec = ReservationSpecification.filterReservations(user, status, minPrice, maxPrice);
 
@@ -85,8 +89,7 @@ public class ReservationService {
     @Transactional
     @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public void deleteReservation(Long id, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+        User user = getCurrentUser(username);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
@@ -97,8 +100,7 @@ public class ReservationService {
     }
     
     public ReservationResponse getReservationById(Long id, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+        User user = getCurrentUser(username);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
@@ -109,14 +111,14 @@ public class ReservationService {
     }
 
     
-    private void validateReservationRequest(ReservationRequest request, Long excludedId) {
+    private void validateReservationRequest(ReservationRequest request) {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new ValidationException("Start and end time must not be null");
         }
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new ValidationException("Start time must be before end time");
         }
-        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), excludedId, ReservationStatus.CANCELLED) > 0) {
+        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime(), ReservationStatus.CANCELLED) > 0) {
             throw new ValidationException("Reservation overlaps with an existing booking");
         }
     }
