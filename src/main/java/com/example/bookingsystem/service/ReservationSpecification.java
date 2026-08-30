@@ -16,9 +16,6 @@ public final class ReservationSpecification {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (user.getRole() == Role.ROLE_USER) {
-                predicates.add(cb.equal(root.join("user", jakarta.persistence.criteria.JoinType.LEFT).get("id"), user.getId()));
-            }
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));
             }
