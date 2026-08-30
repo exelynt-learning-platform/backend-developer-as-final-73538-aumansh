@@ -44,8 +44,8 @@ oot and password password. The database will be created automatically if it does
 ## Seed Users
 **WARNING: Strongly recommend changing these defaults immediately after the first login.**
 Upon startup, the application creates two seed users for testing:
-- **Admin User**: dmin / dmin123
-- **Standard User**: user / user123
+- **Admin User**: admin / (Set via SEED_ADMIN_PASSWORD env variable)
+- **Standard User**: user / (Set via SEED_USER_PASSWORD env variable)
 
 ## API Documentation
 Once the application is running, you can access the Swagger UI documentation at:
