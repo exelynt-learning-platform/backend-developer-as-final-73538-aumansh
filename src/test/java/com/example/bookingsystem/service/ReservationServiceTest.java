@@ -131,15 +131,22 @@ class ReservationServiceTest {
     }
 
     @Test
-    void updateReservationStatus_Success() {
+    void updateReservationStatus_Authentication() {
         Reservation res = new Reservation();
         res.setId(10L);
         res.setStatus(ReservationStatus.PENDING);
 
-        when(reservationRepository.findById(10L)).thenReturn(Optional.of(res));
-        when(reservationRepository.save(any())).thenReturn(res);
+        User testuser = new User();
+        testuser.setId(1L);
+        testuser.setUsername("testuser");
+        testuser.setRole(com.example.bookingsystem.model.Role.ROLE_ADMIN);
+        res.setUser(testuser);
 
-        ReservationResponse response = reservationService.updateReservationStatus(10L, ReservationStatus.CONFIRMED);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testuser));
+        when(reservationRepository.findById(10L)).thenReturn(Optional.of(res));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(res);
+
+        ReservationResponse response = reservationService.updateReservationStatus(10L, ReservationStatus.CONFIRMED, "testuser");
         assertEquals(ReservationStatus.CONFIRMED, response.getStatus());
     }
 }

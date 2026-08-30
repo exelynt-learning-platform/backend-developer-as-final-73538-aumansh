@@ -26,7 +26,7 @@ A RESTful Resource Booking System built with Spring Boot, Java 17+, Spring Secur
    `
 
 2. **Database Configuration:**
-   By default, the application connects to MySQL using `springuser` / `springpass`.
+   By default, the application requires database credentials to be configured.
    You MUST override these settings using environment variables in production:
 
    - DB_URL : The JDBC URL (e.g., jdbc:mysql://localhost:3306/booking_db?createDatabaseIfNotExist=true)
@@ -49,3 +49,6 @@ If SEED_ADMIN_PASSWORD and SEED_USER_PASSWORD are not set in the environment, th
 ## API Documentation
 Once the application is running, you can access the Swagger UI documentation at:
 - http://localhost:8080/swagger-ui/index.html
+
+## Security Notes
+**JWT Storage**: This REST API issues JWT tokens in the response body. For applications with a UI accessed via a browser, storing the token in localStorage is vulnerable to XSS attacks. It is highly recommended to store the token in memory or use an HttpOnly cookie.

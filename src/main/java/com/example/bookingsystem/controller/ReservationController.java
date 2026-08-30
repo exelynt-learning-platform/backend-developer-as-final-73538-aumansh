@@ -51,7 +51,8 @@ public class ReservationController {
             @PageableDefault(size = 10, sort = "id") Pageable pageable,
             Authentication authentication) {
 
-        return ResponseEntity.ok(reservationService.getReservations(AuthUtil.getUsername(authentication), status, minPrice, maxPrice, pageable));
+        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(reservationService.getReservations(AuthUtil.getUsername(authentication), isAdmin, status, minPrice, maxPrice, pageable));
     }
 
     @GetMapping("/{id}")
