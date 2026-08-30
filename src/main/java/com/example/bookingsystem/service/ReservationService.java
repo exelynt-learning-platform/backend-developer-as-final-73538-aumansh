@@ -129,22 +129,15 @@ public class ReservationService {
 
     private ReservationResponse mapToDto(Reservation reservation) {
         ReservationResponse dto = new ReservationResponse();
-        dto.setId(reservation.getId());
-        dto.setUserId(reservation.getUser() != null ? reservation.getUser().getId() : null);
-        dto.setStartTime(reservation.getStartTime());
-        dto.setEndTime(reservation.getEndTime());
-        dto.setPrice(reservation.getPrice());
-        dto.setStatus(reservation.getStatus());
-
-        ResourceDto resourceDto = new ResourceDto();
-        if (reservation.getResource() != null) {
-            resourceDto.setId(reservation.getResource().getId());
-            resourceDto.setName(reservation.getResource().getName());
-            resourceDto.setDescription(reservation.getResource().getDescription());
-            resourceDto.setPrice(reservation.getResource().getPrice());
+        org.springframework.beans.BeanUtils.copyProperties(reservation, dto);
+        if (reservation.getUser() != null) {
+            dto.setUserId(reservation.getUser().getId());
         }
-        dto.setResource(resourceDto);
-
+        if (reservation.getResource() != null) {
+            ResourceDto resourceDto = new ResourceDto();
+            org.springframework.beans.BeanUtils.copyProperties(reservation.getResource(), resourceDto);
+            dto.setResource(resourceDto);
+        }
         return dto;
     }
 

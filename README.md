@@ -42,6 +42,7 @@ oot and password password. The database will be created automatically if it does
    `
 
 ## Seed Users
+**WARNING: DO NOT USE DEFAULT CREDENTIALS IN PRODUCTION.**
 Upon startup, the application creates two seed users for testing:
 - **Admin User**: dmin / dmin123
 - **Standard User**: user / user123

@@ -18,8 +18,13 @@ public class DataSeeder implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DataSeeder.class);
+
     @Override
     public void run(String... args) throws Exception {
+        if ("admin123".equals(System.getenv().getOrDefault("SEED_ADMIN_PASSWORD", "admin123"))) {
+            logger.warn("WARNING: Using default placeholder seed password for admin. Please change in production.");
+        }
         if (userRepository.count() == 0) {
             User admin = new User();
             admin.setUsername("admin");
