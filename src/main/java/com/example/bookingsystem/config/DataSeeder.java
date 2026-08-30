@@ -24,16 +24,25 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String adminPass = env.getProperty("SEED_ADMIN_PASSWORD", "admin");
-        String userPass = env.getProperty("SEED_USER_PASSWORD", "user");
+        String adminPass = env.getProperty("SEED_ADMIN_PASSWORD");
+        if (adminPass == null || adminPass.isEmpty()) {
+            adminPass = java.util.UUID.randomUUID().toString();
+            log.warn("SEED_ADMIN_PASSWORD not set! Generated random admin password: {}", adminPass);
+        }
+        String userPass = env.getProperty("SEED_USER_PASSWORD");
+        if (userPass == null || userPass.isEmpty()) {
+            userPass = java.util.UUID.randomUUID().toString();
+            log.warn("SEED_USER_PASSWORD not set! Generated random user password: {}", userPass);
+        }
         
-        if (userRepository.count() == 0) {
+        if (userRepository.findByUsername("admin").isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode(adminPass));
             admin.setRole(Role.ROLE_ADMIN);
             userRepository.save(admin);
-
+        }
+        if (userRepository.findByUsername("user").isEmpty()) {
             User user = new User();
             user.setUsername("user");
             user.setPassword(passwordEncoder.encode(userPass));

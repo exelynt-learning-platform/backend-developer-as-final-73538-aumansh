@@ -40,8 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
 
-        String uri = request.getRequestURI();
-        if (!StringUtils.hasText(token)) {
+                if (!StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
             return;
         }
