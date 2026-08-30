@@ -2,8 +2,6 @@ package com.example.bookingsystem.service;
 
 import com.example.bookingsystem.model.Reservation;
 import com.example.bookingsystem.model.ReservationStatus;
-import com.example.bookingsystem.model.Role;
-import com.example.bookingsystem.model.User;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Predicate;
@@ -14,7 +12,7 @@ import java.util.List;
 public final class ReservationSpecification {
     private ReservationSpecification() {}
 
-    public static Specification<Reservation> filterReservations(User user, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice) {
+    public static Specification<Reservation> filterReservations(ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

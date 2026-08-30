@@ -16,6 +16,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> authenticationHandling(org.springframework.security.core.AuthenticationException exception) {
+        return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid username or password"), HttpStatus.UNAUTHORIZED);
+    }
+
+
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
@@ -49,9 +55,5 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> globalExceptionHandling(Exception exception) {
-        logger.error("An unexpected error occurred", exception);
-        return new ResponseEntity<>(new ErrorResponse("Internal Server Error", "An unexpected error occurred. Please try again later."), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
 }
