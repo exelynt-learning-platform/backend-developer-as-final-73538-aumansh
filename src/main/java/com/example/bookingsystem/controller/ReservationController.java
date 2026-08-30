@@ -3,6 +3,7 @@ package com.example.bookingsystem.controller;
 import com.example.bookingsystem.dto.ReservationRequest;
 import com.example.bookingsystem.dto.ReservationResponse;
 import com.example.bookingsystem.model.ReservationStatus;
+import com.example.bookingsystem.dto.ReservationStatusRequest;
 import com.example.bookingsystem.service.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -65,8 +66,8 @@ public class ReservationController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
-            @RequestBody java.util.Map<String, ReservationStatus> updates) {
-        return ResponseEntity.ok(reservationService.updateReservationStatus(id, updates.get("status")));
+            @Valid @RequestBody ReservationStatusRequest request) {
+        return ResponseEntity.ok(reservationService.updateReservationStatus(id, request.getStatus()));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")

@@ -11,6 +11,9 @@ public class PaginationUtil {
         if (sortDir == null) {
             throw new ValidationException("Sort direction cannot be null");
         }
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            sortBy = "id";
+        }
         if (sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())) {
             sort = Sort.by(sortBy).ascending();
         } else if (sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())) {

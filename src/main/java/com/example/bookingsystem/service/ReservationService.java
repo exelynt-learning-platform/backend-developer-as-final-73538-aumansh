@@ -41,7 +41,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
@@ -62,7 +62,7 @@ public class ReservationService {
 
     public Page<ReservationResponse> getReservations(String username, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         Specification<Reservation> spec = ReservationSpecification.filterReservations(user, status, minPrice, maxPrice);
 
@@ -85,7 +85,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
@@ -97,7 +97,7 @@ public class ReservationService {
     
     public ReservationResponse getReservationById(Long id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
@@ -122,10 +122,9 @@ public class ReservationService {
     
     private boolean isAdminOrOwner(User user, Reservation reservation) {
         if (user == null || reservation == null) return false;
-        if (user.getRole() == Role.ROLE_ADMIN) {
-            return true;
-        }
-        return reservation.getUser() != null && user.getId().equals(reservation.getUser().getId());
+        if (user.getRole() == Role.ROLE_ADMIN) return true;
+        if (reservation.getUser() == null || reservation.getUser().getId() == null) return false;
+        return user.getId().equals(reservation.getUser().getId());
     }
 
     private ReservationResponse mapToDto(Reservation reservation) {
@@ -142,6 +141,7 @@ public class ReservationService {
             resourceDto.setId(reservation.getResource().getId());
             resourceDto.setName(reservation.getResource().getName());
             resourceDto.setDescription(reservation.getResource().getDescription());
+            resourceDto.setPrice(reservation.getResource().getPrice());
         }
         dto.setResource(resourceDto);
 
