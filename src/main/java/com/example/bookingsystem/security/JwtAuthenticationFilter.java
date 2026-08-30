@@ -66,6 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authenticationEntryPoint.commence(request, response, new org.springframework.security.authentication.AuthenticationServiceException("Invalid JWT token"));
                 return;
             }
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException ex) {
+            logger.error("User not found", ex);
+            SecurityContextHolder.clearContext();
+            authenticationEntryPoint.commence(request, response, new org.springframework.security.authentication.AuthenticationServiceException("User not found"));
+            return;
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
             SecurityContextHolder.clearContext();

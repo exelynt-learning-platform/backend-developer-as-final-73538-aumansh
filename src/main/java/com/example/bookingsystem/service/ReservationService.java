@@ -24,8 +24,7 @@ import java.math.BigDecimal;
 @Service
 public class ReservationService {
 
-    private static final String USER_FIELD = "user";
-    private static final String PERMISSION_DENIED_MSG = "You do not have permission";
+        private static final String PERMISSION_DENIED_MSG = "You do not have permission";
 
 
     private final ReservationRepository reservationRepository;
@@ -66,7 +65,7 @@ public class ReservationService {
                 
         if (!isAdmin) {
             User user = fetchUserForUsername(username);
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(USER_FIELD).get("id"), user.getId()));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(ReservationSpecification.USER_FIELD).get("id"), user.getId()));
         }
 
         return reservationRepository.findAll(spec, pageable).map(DtoMapper::mapToReservationDto);
