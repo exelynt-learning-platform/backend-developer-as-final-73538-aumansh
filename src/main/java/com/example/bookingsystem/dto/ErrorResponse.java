@@ -2,6 +2,7 @@ package com.example.bookingsystem.dto;
 
 import java.time.LocalDateTime;
 
+@lombok.Data
 public class ErrorResponse {
     private String error;
     private String message;
@@ -13,7 +14,4 @@ public class ErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 
-    public String getError() { return error; }
-    public String getMessage() { return message; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-}
+            }

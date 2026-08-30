@@ -1,4 +1,4 @@
-﻿# Resource Booking System
+# Resource Booking System
 
 A RESTful Resource Booking System built with Spring Boot, Java 17+, Spring Security, JWT, and MySQL.
 
@@ -20,36 +20,32 @@ A RESTful Resource Booking System built with Spring Boot, Java 17+, Spring Secur
 ## Setup Instructions
 
 1. **Clone the repository:**
-   `ash
+   `bash
    git clone <repository_url>
    cd backend-developer-as-final-73538-aumansh
    `
 
 2. **Database Configuration:**
-   By default, the application is configured to connect to a MySQL database named ooking_db at localhost:3306 using the username 
-oot and password password. The database will be created automatically if it doesn't exist.
+   By default, the application connects to MySQL using `springuser` / `springpass`.
+   You MUST override these settings using environment variables in production:
 
-   You can override these settings using environment variables:
-
-   - DB_URL : The JDBC URL (e.g., jdbc:mysql://localhost:3306/your_db?createDatabaseIfNotExist=true)
+   - DB_URL : The JDBC URL (e.g., jdbc:mysql://localhost:3306/booking_db?createDatabaseIfNotExist=true)
    - DB_USERNAME : Your database username
    - DB_PASSWORD : Your database password
    - JWT_SECRET : Your JWT secret key (must be at least 256 bits/32 bytes)
 
 3. **Run the Application:**
-   `ash
+   `bash
    ./mvnw spring-boot:run
    `
 
 ## Seed Users
-**WARNING: Strongly recommend changing these defaults immediately after the first login.**
 Upon startup, the application creates two seed users for testing:
-- **Admin User**: dmin / dmin123
-- **Standard User**: user / user123
+- **Admin User**: Username is `admin`
+- **Standard User**: Username is `user`
+
+If SEED_ADMIN_PASSWORD and SEED_USER_PASSWORD are not set in the environment, the application will generate secure random passwords for them and print a warning in the logs. Please check the logs or set the environment variables.
 
 ## API Documentation
 Once the application is running, you can access the Swagger UI documentation at:
 - http://localhost:8080/swagger-ui/index.html
-
-## Postman Collection
-Alternatively, you can interact with the API endpoints using tools like Postman. Remember to authenticate via /auth/login and include the generated token in the Authorization header as Bearer <token> for protected endpoints.

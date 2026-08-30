@@ -5,6 +5,7 @@ import com.example.bookingsystem.exception.ResourceNotFoundException;
 import com.example.bookingsystem.model.Resource;
 import com.example.bookingsystem.repository.ResourceRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ public class ResourceService {
         this.resourceRepository = resourceRepository;
     }
 
+    @Transactional
     public ResourceDto createResource(ResourceDto resourceDto) {
         Resource resource = new Resource();
         resource.setName(resourceDto.getName());
@@ -39,6 +41,7 @@ public class ResourceService {
         return DtoMapper.mapToResourceDto(resource);
     }
 
+    @Transactional
     public ResourceDto updateResource(Long id, ResourceDto resourceDto) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
@@ -49,6 +52,7 @@ public class ResourceService {
         return DtoMapper.mapToResourceDto(updated);
     }
 
+    @Transactional
     public void deleteResource(Long id) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));

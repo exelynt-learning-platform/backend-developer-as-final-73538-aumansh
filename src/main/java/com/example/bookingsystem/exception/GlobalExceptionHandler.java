@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.example.bookingsystem.dto.ErrorResponse;
+import com.example.bookingsystem.dto.ValidationErrorResponse;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,6 +17,19 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> messageNotReadableHandling(org.springframework.http.converter.HttpMessageNotReadableException exception) {
+        return new ResponseEntity<>(new ErrorResponse("Bad Request", "Malformed JSON request"), HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> authenticationHandling(org.springframework.security.core.AuthenticationException exception) {
+        logger.error("Authentication failed: {}", exception.getMessage());
+        return new ResponseEntity<>(new ErrorResponse("Unauthorized", "Invalid credentials"), HttpStatus.UNAUTHORIZED);
+    }
+
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> accessDeniedHandling(org.springframework.security.access.AccessDeniedException exception) {
@@ -36,20 +52,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, Object> errors = new LinkedHashMap<>();
-        errors.put("timestamp", new Date());
+    public ResponseEntity<List<ValidationErrorResponse>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<ValidationErrorResponse> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((org.springframework.validation.FieldError) error).getField();
+            String fieldName = error instanceof org.springframework.validation.FieldError ? ((org.springframework.validation.FieldError) error).getField() : error.getObjectName();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errors.add(new ValidationErrorResponse(fieldName, errorMessage));
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> globalExceptionHandling(Exception exception) {
-        logger.error("An unexpected error occurred", exception);
-        return new ResponseEntity<>(new ErrorResponse("Internal Server Error", "An unexpected error occurred. Please try again later."), HttpStatus.INTERNAL_SERVER_ERROR);
+    public org.springframework.http.ResponseEntity<com.example.bookingsystem.dto.ErrorResponse> handleGlobalException(Exception ex) {
+        logger.error("Unhandled exception: ", ex);
+        return new org.springframework.http.ResponseEntity<>(new com.example.bookingsystem.dto.ErrorResponse("Internal Server Error", "An unexpected error occurred"), org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

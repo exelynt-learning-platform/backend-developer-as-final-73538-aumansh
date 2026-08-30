@@ -7,6 +7,9 @@ import com.example.bookingsystem.model.Resource;
 import org.springframework.beans.BeanUtils;
 
 public class DtoMapper {
+
+    private DtoMapper() {}
+
     public static ReservationResponse mapToReservationDto(Reservation reservation) {
         ReservationResponse dto = new ReservationResponse();
         BeanUtils.copyProperties(reservation, dto);

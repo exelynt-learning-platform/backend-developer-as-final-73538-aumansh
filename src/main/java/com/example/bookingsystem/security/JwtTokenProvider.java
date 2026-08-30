@@ -17,6 +17,8 @@ import jakarta.annotation.PostConstruct;
 @lombok.extern.slf4j.Slf4j
 public class JwtTokenProvider {
 
+    private static final int MIN_SECRET_LENGTH = 32;
+
     private final String jwtSecret;
     private final long jwtExpirationDate;
     private Key cachedKey;
@@ -29,19 +31,24 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${")) {
+        if (jwtSecret == null || jwtSecret.isEmpty() || jwtSecret.startsWith("${jwt.secret}")) {
             throw new IllegalArgumentException("JWT_SECRET environment variable is missing or empty.");
         }
-        if (Decoders.BASE64.decode(jwtSecret).length < 32) {
-            throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
+        try {
+            byte[] decoded = Decoders.BASE64.decode(jwtSecret);
+            if (decoded.length < MIN_SECRET_LENGTH) {
+                throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
+            }
+            this.cachedKey = Keys.hmacShaKeyFor(decoded);
+        } catch (io.jsonwebtoken.io.DecodingException e) {
+            throw new IllegalArgumentException("JWT_SECRET must be a valid BASE64 string.", e);
         }
-        this.cachedKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
-        String role = authentication.getAuthorities().iterator().next().getAuthority();
+        String role = authentication.getAuthorities().isEmpty() ? "" : authentication.getAuthorities().iterator().next().getAuthority();
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationDate);
 
