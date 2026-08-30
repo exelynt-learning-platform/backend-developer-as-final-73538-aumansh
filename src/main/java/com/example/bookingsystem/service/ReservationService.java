@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.List;
 import jakarta.persistence.criteria.Predicate;
 
 @Service
+@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -103,7 +105,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && !reservation.getUser().getId().equals(user.getId())) {
+        if (user.getRole() == Role.ROLE_USER && reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedException("You do not have permission to delete this reservation");
         }
         reservationRepository.delete(reservation);
@@ -115,7 +117,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && !reservation.getUser().getId().equals(user.getId())) {
+        if (user.getRole() == Role.ROLE_USER && reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedException("You do not have permission to view this reservation");
         }
         return mapToDto(reservation);
@@ -124,18 +126,19 @@ public class ReservationService {
     private ReservationResponse mapToDto(Reservation reservation) {
         ReservationResponse dto = new ReservationResponse();
         dto.setId(reservation.getId());
-        dto.setUserId(reservation.getUser().getId());
+        dto.setUserId(reservation.getUser() != null ? reservation.getUser().getId() : null);
         dto.setStartTime(reservation.getStartTime());
         dto.setEndTime(reservation.getEndTime());
         dto.setPrice(reservation.getPrice());
         dto.setStatus(reservation.getStatus());
 
         ResourceDto resourceDto = new ResourceDto();
-        resourceDto.setId(reservation.getResource().getId());
-        resourceDto.setName(reservation.getResource().getName());
-        resourceDto.setDescription(reservation.getResource().getDescription());
+        if (reservation.getResource() != null) {
+            resourceDto.setId(reservation.getResource().getId());
+            resourceDto.setName(reservation.getResource().getName());
+            resourceDto.setDescription(reservation.getResource().getDescription());
+        }
         dto.setResource(resourceDto);
 
         return dto;
     }
-}
