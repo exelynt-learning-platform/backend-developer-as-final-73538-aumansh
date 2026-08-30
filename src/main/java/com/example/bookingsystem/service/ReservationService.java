@@ -52,6 +52,9 @@ public class ReservationService {
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new ValidationException("Start time must be before end time");
         }
+        if (reservationRepository.countOverlappingReservations(request.getResourceId(), request.getStartTime(), request.getEndTime()) > 0) {
+            throw new ValidationException("Reservation overlaps with an existing booking");
+        }
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
