@@ -105,7 +105,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && (reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId()))) {
+        if (!isAdminOrOwner(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to delete this reservation");
         }
         reservationRepository.delete(reservation);
@@ -117,10 +117,18 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
 
-        if (user.getRole() == Role.ROLE_USER && (reservation.getUser() == null || !reservation.getUser().getId().equals(user.getId()))) {
+        if (!isAdminOrOwner(user, reservation)) {
             throw new UnauthorizedException("You do not have permission to view this reservation");
         }
         return mapToDto(reservation);
+    }
+
+    
+    private boolean isAdminOrOwner(User user, Reservation reservation) {
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            return true;
+        }
+        return reservation.getUser() != null && reservation.getUser().getId().equals(user.getId());
     }
 
     private ReservationResponse mapToDto(Reservation reservation) {
