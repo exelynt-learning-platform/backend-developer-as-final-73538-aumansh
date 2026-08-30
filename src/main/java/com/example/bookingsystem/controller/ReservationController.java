@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.example.bookingsystem.security.AuthUtil;
 
 import java.math.BigDecimal;
 
@@ -22,8 +23,6 @@ import java.math.BigDecimal;
 public class ReservationController {
 
 
-        return authentication.getName();
-    }
 
 
     private final ReservationService reservationService;
@@ -36,7 +35,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @Valid @RequestBody ReservationRequest request,
             Authentication authentication) {
-        return new ResponseEntity<>(reservationService.createReservation(request, com.example.bookingsystem.security.AuthUtil.getUsername(authentication)), HttpStatus.CREATED);
+        return new ResponseEntity<>(reservationService.createReservation(request, AuthUtil.getUsername(authentication)), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -52,12 +51,12 @@ public class ReservationController {
         
         Pageable pageable = PaginationUtil.createPageable(page, size, sortBy, sortDir);
 
-        return ResponseEntity.ok(reservationService.getReservations(com.example.bookingsystem.security.AuthUtil.getUsername(authentication), status, minPrice, maxPrice, pageable));
+        return ResponseEntity.ok(reservationService.getReservations(AuthUtil.getUsername(authentication), status, minPrice, maxPrice, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getReservationById(@PathVariable Long id, Authentication authentication) {
-        return ResponseEntity.ok(reservationService.getReservationById(id, com.example.bookingsystem.security.AuthUtil.getUsername(authentication)));
+        return ResponseEntity.ok(reservationService.getReservationById(id, AuthUtil.getUsername(authentication)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -70,7 +69,7 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
-        reservationService.deleteReservation(id, com.example.bookingsystem.security.AuthUtil.getUsername(authentication));
+        reservationService.deleteReservation(id, AuthUtil.getUsername(authentication));
         return ResponseEntity.ok("Reservation deleted successfully");
     }
 }
