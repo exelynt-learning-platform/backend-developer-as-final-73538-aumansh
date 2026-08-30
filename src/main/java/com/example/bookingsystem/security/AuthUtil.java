@@ -9,4 +9,9 @@ public class AuthUtil {
         }
         return authentication.getName();
     }
+
+    public static boolean isAdmin(Authentication authentication) {
+        if (authentication == null) return false;
+        return authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
 }

@@ -48,7 +48,7 @@ public class ReservationController {
             @RequestParam(required = false) ReservationStatus status,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @PageableDefault(size = 10, sort = "id") Pageable pageable,
+            @PageableDefault(size = 10, sort = {"id"}) Pageable pageable,
             Authentication authentication) {
 
         boolean isAdmin = AuthUtil.isAdmin(authentication);
