@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.bookingsystem.security.AuthUtil;
-
 import java.math.BigDecimal;
 
 @RestController
@@ -71,6 +69,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.updateReservationStatus(id, updates.get("status")));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id, Authentication authentication) {
         reservationService.deleteReservation(id, AuthUtil.getUsername(authentication));

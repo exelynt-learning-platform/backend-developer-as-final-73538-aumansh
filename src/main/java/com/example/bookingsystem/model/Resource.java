@@ -21,5 +21,6 @@ public class Resource {
 
     @Column
     private String description;
+    @jakarta.persistence.Column(precision = 10, scale = 2)
     private java.math.BigDecimal price;
 }
